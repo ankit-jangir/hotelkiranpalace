@@ -8,6 +8,7 @@ A complete hotel booking website built with Laravel framework featuring a respon
 - [Project Structure](#project-structure)
 - [Features](#features)
 - [Technology Stack](#technology-stack)
+- [Colors & Theme](#colors--theme)
 - [Installation](#installation)
 - [File Structure](#file-structure)
 - [Routes](#routes)
@@ -114,6 +115,53 @@ Hotelkiran/
 - **JavaScript**: Bootstrap JS (from public/js/boot.js)
 - **Icons**: Font Awesome 6.5.1 (CDN)
 - **Authentication**: Session-based (no database)
+
+## 🎨 Colors & Theme
+
+### Primary Color Scheme
+
+The project uses an **Orange to Pink Gradient Theme** with the following color palette:
+
+#### Main Colors
+- **Primary Orange**: `rgb(255, 161, 0)` / `#ffa100` - Default button state, brand color
+- **Red Orange**: `rgb(247, 71, 15)` / `#f7470f` - Gradient middle color
+- **Pink**: `rgb(238, 17, 98)` / `#ee1162` - Gradient end color
+- **Active State**: `#ff6b35` - Navigation active links and dots
+
+#### Color Usage
+
+**Navigation & Header:**
+- **Active Links**: `#ff6b35` (orange, positioned on left side)
+- **Nav Dots**: `#ff6b35` (orange, positioned on left side)
+- **Hover States**: `#ff6b35` (orange)
+- **Default Text**: `#333` (dark gray)
+
+**Buttons:**
+- **Default State**: `rgb(255, 161, 0)` - Solid orange button background
+- **Hover/Active Gradient**: `linear-gradient(89deg, rgb(255, 161, 0) 11.51%, rgb(247, 71, 15) 52.88%, rgb(238, 17, 98) 92.44%)`
+  - **89 degrees** angle: Orange → Red Orange → Pink
+  - Gradient slides from **left to right** on hover/click
+
+**Theme Features:**
+- Active navigation links show orange dot on **left side**
+- Navigation dots appear on hover and stay visible for active pages
+- Button gradient slides from left on hover/click with smooth animation
+- All interactive elements use theme colors
+
+**CSS Color Codes:**
+```css
+/* Button Colors */
+Default Button: rgb(255, 161, 0) /* #ffa100 */
+Hover Gradient: linear-gradient(89deg, 
+  rgb(255, 161, 0) 11.51%,      /* Orange start */
+  rgb(247, 71, 15) 52.88%,      /* Red Orange middle */
+  rgb(238, 17, 98) 92.44%       /* Pink end */
+)
+
+/* Navigation Colors */
+Active Links/Dots: #ff6b35
+Default Text: #333
+```
 
 ## 📦 Installation
 
@@ -398,6 +446,49 @@ All pages use `common/layout.blade.php` and include:
 - Update contact details
 - View contact inquiries
 - Enable/disable sections
+
+## 🎨 Color Scheme & Theme
+
+### Primary Colors
+
+**Orange Theme** - Used throughout the website:
+- **Primary Orange**: `#ff6b35` (Used in links, dropdown indicators, hover states)
+- **Light Orange**: `#ff8c5a` (Default button background, lighter accents)
+- **Orange Gradient**: `#ff6b35` → `#ff8c5a` → `#ff6b9d` (Button hover effect)
+
+### Color Usage
+
+#### Navigation & UI Elements
+- **Nav Link Hover**: `#ff6b35` (Orange)
+- **Dropdown Indicators**: `#ff6b35` (Orange chevron icons)
+- **Hover Dots**: `#ff6b35` (Orange dots below nav links on hover)
+- **Button Default**: `#ff8c5a` (Light orange - solid)
+- **Button Hover**: Gradient from `#ff6b35` to `#ff8c5a` to `#ff6b9d` (slides from left)
+- **Text Color**: `#333` (Dark gray for main text)
+- **Background**: `#ffffff` (White)
+
+#### Toast Notification Colors
+- **Success**: Green (`bg-success`)
+- **Error**: Red (`bg-danger`)
+- **Warning**: Yellow (`bg-warning`)
+- **Info**: Blue (`bg-info`)
+
+### Theme Features
+- **Fixed Header**: White background with shadow, always visible at top
+- **Centered Navigation**: Nav links centered on desktop
+- **Rounded Dropdowns**: Rounded corners (`rounded-3`) with shadow
+- **Smooth Transitions**: 0.3s-0.4s transition effects
+- **Gradient Effects**: Orange to pink gradient on button hover (slides from left)
+- **Responsive Design**: Mobile-first approach with Bootstrap breakpoints
+
+### Button Styling
+
+**Book Your Stay Button**:
+- **Default State**: Light orange solid (`#ff8c5a`)
+- **Hover State**: Orange to pink gradient sliding from left
+- **Shape**: Rounded pill (`rounded-pill`)
+- **Desktop Size**: `min-width: 140px`, `height: 40px`
+- **Mobile Size**: `min-width: 120px`, `height: 36px`
 
 ## 🎨 Styling & Assets
 

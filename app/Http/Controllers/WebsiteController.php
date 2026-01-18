@@ -60,4 +60,14 @@ class WebsiteController extends Controller
     {
         return view('website.blog');
     }
+
+    public function bookingPolicy()
+    {
+        return view('website.booking-policy');
+    }
+
+    public function cancellationPolicy()
+    {
+        return view('website.cancellation-policy');
+    }
 }
