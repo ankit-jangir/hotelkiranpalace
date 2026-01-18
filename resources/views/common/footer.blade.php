@@ -14,7 +14,12 @@
                     <h6 class="subscribe-heading mb-2">Subscribe For Latest Updates</h6>
                     <form class="d-flex gap-2 subscribe-form" id="subscribeForm">
                         <input type="email" class="form-control subscribe-input" placeholder="Enter Your Email Address" required>
-                        <button type="submit" class="btn subscribe-btn">Subscribe</button>
+                        <button type="submit" class="btn subscribe-btn" id="subscribeBtn">
+                            <span class="subscribe-btn-text">Subscribe</span>
+                            <span class="subscribe-btn-loader d-none">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                        </button>
                     </form>
                 </div>
             </div>

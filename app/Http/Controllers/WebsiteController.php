@@ -70,4 +70,39 @@ class WebsiteController extends Controller
     {
         return view('website.cancellation-policy');
     }
+
+    public function roomDetail($slug)
+    {
+        $roomData = [
+            'deluxe-room' => [
+                'title' => 'Deluxe Room',
+                'price' => '₹3,500',
+                'description' => 'Spacious room with modern amenities and elegant decor for a comfortable stay.',
+                'image' => asset('images/hero_section_img1.png'),
+            ],
+            'super-deluxe-room' => [
+                'title' => 'Super Deluxe Room',
+                'price' => '₹5,000',
+                'description' => 'Enhanced luxury with additional space and premium furnishings for ultimate comfort.',
+                'image' => asset('images/hero_section_img2.jpg'),
+            ],
+            'suite-room' => [
+                'title' => 'Suite Room',
+                'price' => '₹8,500',
+                'description' => 'Our finest accommodation with separate living area and royal amenities.',
+                'image' => asset('images/hero_section_img3.jpg'),
+            ],
+            'executive-room' => [
+                'title' => 'Executive Room',
+                'price' => '₹4,500',
+                'description' => 'Business-class room designed for corporate travelers with work desk and high-speed internet.',
+                'image' => asset('images/hero_section_img1.png'),
+            ],
+        ];
+
+        $room = $roomData[$slug] ?? $roomData['deluxe-room'];
+        $room['slug'] = $slug;
+
+        return view('website.room-detail', compact('room'));
+    }
 }

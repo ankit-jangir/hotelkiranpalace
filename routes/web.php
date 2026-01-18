@@ -8,6 +8,7 @@ use App\Http\Controllers\AdminController;
 Route::get('/', [WebsiteController::class, 'home'])->name('home');
 Route::get('/about', [WebsiteController::class, 'about'])->name('about');
 Route::get('/rooms', [WebsiteController::class, 'rooms'])->name('rooms');
+Route::get('/room/{slug}', [WebsiteController::class, 'roomDetail'])->name('room.detail');
 Route::get('/amenities', [WebsiteController::class, 'amenities'])->name('amenities');
 Route::get('/gallery', [WebsiteController::class, 'gallery'])->name('gallery');
 Route::get('/contact', [WebsiteController::class, 'contact'])->name('contact');
@@ -26,10 +27,13 @@ Route::post('/login/hotelkiranpalace/admin', [AdminController::class, 'login'])-
 // Admin Routes (Protected)
 Route::prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/profile', [AdminController::class, 'profile'])->name('admin.profile');
+    Route::get('/blogs', [AdminController::class, 'blogs'])->name('admin.blogs');
+    Route::get('/gallery', [AdminController::class, 'gallery'])->name('admin.gallery');
+    Route::get('/rooms', [AdminController::class, 'rooms'])->name('admin.rooms');
+    Route::get('/hero-section', [AdminController::class, 'heroSection'])->name('admin.hero-section');
+    Route::get('/user-form-details', [AdminController::class, 'userFormDetails'])->name('admin.user-form-details');
+    Route::get('/user-subscribe-details', [AdminController::class, 'userSubscribeDetails'])->name('admin.user-subscribe-details');
+    Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
     Route::post('/logout', [AdminController::class, 'logout'])->name('admin.logout');
-    
-    // Add more admin routes here
-    // Route::get('/content', [AdminController::class, 'content'])->name('admin.content');
-    // Route::get('/rooms', [AdminController::class, 'rooms'])->name('admin.rooms');
-    // Route::get('/gallery', [AdminController::class, 'gallery'])->name('admin.gallery');
 });

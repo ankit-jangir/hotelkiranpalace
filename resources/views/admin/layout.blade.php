@@ -21,11 +21,21 @@
     <!-- Page Specific Styles -->
     @stack('styles')
 </head>
-<body>
-    @include('admin.navbar')
-
-    <div class="container-fluid mt-4">
-        @yield('content')
+<body class="admin-body" data-theme="light">
+    <!-- Sidebar -->
+    @include('admin.sidebar')
+    
+    <!-- Main Content Wrapper -->
+    <div class="admin-main-wrapper">
+        <!-- Header -->
+        @include('admin.header')
+        
+        <!-- Main Content -->
+        <main class="admin-main-content">
+            <div class="admin-content-container">
+                @yield('content')
+            </div>
+        </main>
     </div>
 
     <!-- Global Bootstrap JS -->
@@ -34,8 +44,125 @@
     <!-- Frontend Custom JS -->
     <script src="{{ asset('frontend/main.js') }}"></script>
     
+    <!-- Admin Sidebar Toggle & Theme Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('adminSidebar');
+            const sidebarToggle = document.getElementById('adminSidebarToggle');
+            const sidebarClose = document.getElementById('adminSidebarClose');
+            const sidebarOverlay = document.getElementById('adminSidebarOverlay');
+            const themeToggle = document.getElementById('adminThemeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const body = document.body;
+            
+            // Load sidebar state from localStorage
+            const sidebarState = localStorage.getItem('adminSidebarState');
+            if (sidebarState === 'collapsed' && window.innerWidth >= 1200) {
+                sidebar.classList.add('collapsed');
+                document.body.classList.add('sidebar-collapsed');
+            }
+            
+            // Toggle sidebar
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    if (window.innerWidth >= 1200) {
+                        // Desktop: Toggle collapse
+                        sidebar.classList.toggle('collapsed');
+                        document.body.classList.toggle('sidebar-collapsed');
+                        localStorage.setItem('adminSidebarState', sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+                    } else {
+                        // Mobile: Toggle open/close
+                        sidebar.classList.toggle('active');
+                        sidebarOverlay.classList.toggle('active');
+                        document.body.classList.toggle('sidebar-open');
+                    }
+                });
+            }
+            
+            // Close sidebar button (mobile)
+            if (sidebarClose) {
+                sidebarClose.addEventListener('click', function() {
+                    sidebar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                    document.body.classList.remove('sidebar-open');
+                });
+            }
+            
+            // Close sidebar when overlay is clicked
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', function() {
+                    sidebar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                    document.body.classList.remove('sidebar-open');
+                });
+            }
+            
+            // Theme Toggle
+            if (themeToggle) {
+                // Load theme from localStorage
+                const savedTheme = localStorage.getItem('adminTheme') || 'light';
+                if (savedTheme === 'dark') {
+                    body.setAttribute('data-theme', 'dark');
+                    body.classList.add('theme-dark');
+                    if (themeIcon) {
+                        themeIcon.classList.remove('fa-moon');
+                        themeIcon.classList.add('fa-sun');
+                    }
+                }
+                
+                themeToggle.addEventListener('click', function() {
+                    const currentTheme = body.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    
+                    body.setAttribute('data-theme', newTheme);
+                    body.classList.toggle('theme-dark');
+                    localStorage.setItem('adminTheme', newTheme);
+                    
+                    if (themeIcon) {
+                        if (newTheme === 'dark') {
+                            themeIcon.classList.remove('fa-moon');
+                            themeIcon.classList.add('fa-sun');
+                        } else {
+                            themeIcon.classList.remove('fa-sun');
+                            themeIcon.classList.add('fa-moon');
+                        }
+                    }
+                });
+            }
+            
+            // Close sidebar on window resize (if desktop)
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 1200) {
+                    sidebar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                    document.body.classList.remove('sidebar-open');
+                } else {
+                    sidebar.classList.remove('collapsed');
+                    document.body.classList.remove('sidebar-collapsed');
+                }
+            });
+        });
+    </script>
+    
     <!-- Global Toast System -->
     @include('common.toast')
+    
+    <!-- Show Server-Side Toast Messages -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(session('success'))
+                if (typeof toast === 'function') {
+                    toast('success', '{{ session('success') }}');
+                }
+            @endif
+
+            @if(session('error'))
+                if (typeof toast === 'function') {
+                    toast('error', '{{ session('error') }}');
+                }
+            @endif
+        });
+    </script>
     
     <!-- Page Specific Scripts -->
     @stack('scripts')
