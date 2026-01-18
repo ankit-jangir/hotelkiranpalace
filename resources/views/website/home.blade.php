@@ -16,10 +16,10 @@
             <p class="hero-subtitle mb-2">5-STAR HOTEL</p>
             <h1 class="hero-title mb-3">Hotel Kiran Place</h1>
             <p class="hero-tagline mb-4">Luxury Stay • Premium Comfort • Royal Experience</p>
-            <div class="hero-buttons d-flex gap-3 justify-content-center">
-                <a href="{{ route('contact') }}" class="btn btn-hero-primary">Book Now</a>
-                <a href="{{ route('rooms') }}" class="btn btn-hero-outline">Explore Rooms</a>
-            </div>
+                        <div class="hero-buttons d-flex gap-3 justify-content-center">
+                            <a href="{{ route('contact') }}" class="btn btn-hero-primary"><span>Book Now</span></a>
+                            <a href="{{ route('rooms') }}" class="btn btn-hero-outline"><span>Explore Rooms</span></a>
+                        </div>
         </div>
     </div>
 
@@ -36,7 +36,7 @@
         <div class="carousel-inner">
             <!-- Slide 1 -->
             <div class="carousel-item active position-relative">
-                <img src="{{ asset('images/hero_section_img1.png') }}" class="d-block w-100 hero-slide-img d-none d-xl-block" alt="Hotel Exterior" onerror="handleImageError(this, 0)">
+                <img src="{{ asset('images/hero_section_img1.png') }}" class="d-block w-100 hero-slide-img d-none d-xl-block" alt="Hotel Exterior" loading="eager" data-no-skeleton onerror="handleImageError(this, 0)">
                 <video autoplay muted loop playsinline preload="auto" class="d-block d-xl-none w-100 h-100 hero-slide-video" style="object-fit: cover; width: 100%; height: 100%;">
                     <source src="{{ asset('videos/home-page-new-video-35-sec-web.mp4') }}" type="video/mp4">
                     Your browser does not support the video tag.
@@ -46,16 +46,16 @@
                     <p class="hero-subtitle mb-2">5-STAR HOTEL</p>
                     <h1 class="hero-title mb-3">Hotel Kiran Place</h1>
                     <p class="hero-tagline mb-4">Luxury Stay • Premium Comfort • Royal Experience</p>
-                    <div class="hero-buttons d-flex gap-3 justify-content-center">
-                        <a href="{{ route('contact') }}" class="btn btn-hero-primary">Book Now</a>
-                        <a href="{{ route('rooms') }}" class="btn btn-hero-outline">Explore Rooms</a>
-                    </div>
+                        <div class="hero-buttons d-flex gap-3 justify-content-center">
+                            <a href="{{ route('contact') }}" class="btn btn-hero-primary"><span>Book Now</span></a>
+                            <a href="{{ route('rooms') }}" class="btn btn-hero-outline"><span>Explore Rooms</span></a>
+                        </div>
                 </div>
             </div>
 
             <!-- Slide 2 -->
             <div class="carousel-item position-relative">
-                <img src="{{ asset('images/hero_section_img2.jpg') }}" class="d-block w-100 hero-slide-img d-none d-xl-block" alt="Hotel Interior" onerror="handleImageError(this, 1)">
+                <img src="{{ asset('images/hero_section_img2.jpg') }}" class="d-block w-100 hero-slide-img d-none d-xl-block" alt="Hotel Interior" loading="eager" data-no-skeleton onerror="handleImageError(this, 1)">
                 <video autoplay muted loop playsinline preload="auto" class="d-block d-xl-none w-100 h-100 hero-slide-video" style="object-fit: cover; width: 100%; height: 100%;">
                     <source src="{{ asset('videos/home-page-new-video-35-sec-web.mp4') }}" type="video/mp4">
                     Your browser does not support the video tag.
@@ -66,15 +66,15 @@
                     <h1 class="hero-title mb-3">Experience Unmatched Elegance</h1>
                     <p class="hero-tagline mb-4">World-class amenities • Fine dining • Premium services • Unforgettable memories</p>
                     <div class="hero-buttons d-flex gap-3 justify-content-center">
-                        <a href="{{ route('amenities') }}" class="btn btn-hero-primary">View Amenities</a>
-                        <a href="{{ route('gallery') }}" class="btn btn-hero-outline">Photo Gallery</a>
+                        <a href="{{ route('amenities') }}" class="btn btn-hero-primary"><span>View Amenities</span></a>
+                        <a href="{{ route('gallery') }}" class="btn btn-hero-outline"><span>Photo Gallery</span></a>
                     </div>
                 </div>
             </div>
 
             <!-- Slide 3 -->
             <div class="carousel-item position-relative">
-                <img src="{{ asset('images/hero_section_img3.jpg') }}" class="d-block w-100 hero-slide-img d-none d-xl-block" alt="Hotel Facilities" onerror="handleImageError(this, 2)">
+                <img src="{{ asset('images/hero_section_img3.jpg') }}" class="d-block w-100 hero-slide-img d-none d-xl-block" alt="Hotel Facilities" loading="eager" data-no-skeleton onerror="handleImageError(this, 2)">
                 <video autoplay muted loop playsinline preload="auto" class="d-block d-xl-none w-100 h-100 hero-slide-video" style="object-fit: cover; width: 100%; height: 100%;">
                     <source src="{{ asset('videos/home-page-new-video-35-sec-web.mp4') }}" type="video/mp4">
                     Your browser does not support the video tag.
@@ -85,8 +85,8 @@
                     <h1 class="hero-title mb-3">Romantic Getaway Destination</h1>
                     <p class="hero-tagline mb-4">Intimate suites • Special packages • Candlelight dinners • Couple spa treatments</p>
                     <div class="hero-buttons d-flex gap-3 justify-content-center">
-                        <a href="{{ route('rooms') }}" class="btn btn-hero-primary">Romantic Packages</a>
-                        <a href="{{ route('contact') }}" class="btn btn-hero-outline">Book Now</a>
+                        <a href="{{ route('rooms') }}" class="btn btn-hero-primary"><span>Romantic Packages</span></a>
+                        <a href="{{ route('contact') }}" class="btn btn-hero-outline"><span>Book Now</span></a>
                     </div>
                 </div>
             </div>
@@ -99,52 +99,61 @@
     </div>
 </section>
 
-<!-- About Section -->
-<section class="container mb-5">
-    <div class="row">
-        <div class="col-md-6">
-            <h2>About Hotel Kiran Place</h2>
-            <p>Experience luxury and comfort at Hotel Kiran Place. We provide exceptional service and amenities for your perfect stay.</p>
-            <a href="{{ route('about') }}" class="btn btn-primary">Learn More</a>
-        </div>
-        <div class="col-md-6">
-            <img src="https://via.placeholder.com/600x400" alt="Hotel" class="img-fluid rounded">
-        </div>
-    </div>
-</section>
+<!-- Latest Blog Section (Common Component) -->
+@include('common.latest-blog')
 
-<!-- Rooms Preview Section -->
-<section class="bg-light py-5 mb-5">
+<!-- Welcome to Hotel Kiran Palace Section -->
+<section class="welcome-section py-5">
     <div class="container">
-        <h2 class="text-center mb-4">Our Rooms</h2>
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <img src="https://via.placeholder.com/400x300" class="card-img-top" alt="Room">
-                    <div class="card-body">
-                        <h5 class="card-title">Deluxe Room</h5>
-                        <p class="card-text">Comfortable and spacious rooms for your stay.</p>
-                        <a href="{{ route('rooms') }}" class="btn btn-primary">View Details</a>
-                    </div>
+        <div class="row align-items-center g-4">
+            <!-- Image Column (Left on Desktop, Top on Mobile) -->
+            <div class="col-lg-6 col-md-12 order-1 order-lg-1">
+                <div class="welcome-image-container position-relative">
+                    <img src="{{ asset('images/hero_section_img1.png') }}" alt="Hotel Kiran Palace Lobby" class="welcome-image img-fluid rounded" loading="lazy">
                 </div>
             </div>
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <img src="https://via.placeholder.com/400x300" class="card-img-top" alt="Room">
-                    <div class="card-body">
-                        <h5 class="card-title">Suite Room</h5>
-                        <p class="card-text">Luxury suites with premium amenities.</p>
-                        <a href="{{ route('rooms') }}" class="btn btn-primary">View Details</a>
+            
+            <!-- Content Column (Right on Desktop, Bottom on Mobile) -->
+            <div class="col-lg-6 col-md-12 order-2 order-lg-2">
+                <h2 class="welcome-heading mb-3">Welcome to Hotel Kiran Palace</h2>
+                <p class="welcome-description mb-4">Experience unparalleled luxury and royal hospitality at Hotel Kiran Palace. Our premium accommodations blend traditional elegance with modern comfort, offering you an unforgettable stay in the heart of luxury.</p>
+                
+                <!-- Feature Boxes -->
+                <div class="welcome-features">
+                    <div class="welcome-feature-box mb-3">
+                        <div class="d-flex align-items-start">
+                            <div class="feature-icon-wrapper me-3">
+                                <i class="fas fa-concierge-bell feature-icon"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h5 class="feature-title mb-1">24x7 Room Service</h5>
+                                <p class="feature-description mb-0">Round-the-clock service for all your needs</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <img src="https://via.placeholder.com/400x300" class="card-img-top" alt="Room">
-                    <div class="card-body">
-                        <h5 class="card-title">Executive Room</h5>
-                        <p class="card-text">Perfect for business travelers.</p>
-                        <a href="{{ route('rooms') }}" class="btn btn-primary">View Details</a>
+                    
+                    <div class="welcome-feature-box mb-3">
+                        <div class="d-flex align-items-start">
+                            <div class="feature-icon-wrapper me-3">
+                                <i class="fas fa-crown feature-icon"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h5 class="feature-title mb-1">Premium Rooms</h5>
+                                <p class="feature-description mb-0">Elegantly designed with luxury amenities</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="welcome-feature-box mb-3">
+                        <div class="d-flex align-items-start">
+                            <div class="feature-icon-wrapper me-3">
+                                <i class="fas fa-utensils feature-icon"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h5 class="feature-title mb-1">Fine Dining Restaurant</h5>
+                                <p class="feature-description mb-0">Exquisite cuisine crafted by expert chefs</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -152,38 +161,22 @@
     </div>
 </section>
 
-<!-- Amenities Preview Section -->
-<section class="container mb-5">
-    <h2 class="text-center mb-4">Our Amenities</h2>
-    <div class="row">
-        <div class="col-md-3 text-center mb-4">
-            <div class="mb-3">
-                <i class="fas fa-wifi fa-3x text-primary"></i>
-            </div>
-            <h5>Free WiFi</h5>
-        </div>
-        <div class="col-md-3 text-center mb-4">
-            <div class="mb-3">
-                <i class="fas fa-parking fa-3x text-primary"></i>
-            </div>
-            <h5>Parking</h5>
-        </div>
-        <div class="col-md-3 text-center mb-4">
-            <div class="mb-3">
-                <i class="fas fa-utensils fa-3x text-primary"></i>
-            </div>
-            <h5>Restaurant</h5>
-        </div>
-        <div class="col-md-3 text-center mb-4">
-            <div class="mb-3">
-                <i class="fas fa-swimming-pool fa-3x text-primary"></i>
-            </div>
-            <h5>Swimming Pool</h5>
-        </div>
-    </div>
-    <div class="text-center mt-4">
-        <a href="{{ route('amenities') }}" class="btn btn-primary">View All Amenities</a>
-    </div>
-</section>
+<!-- Our Royal Rooms Section (Common Component) -->
+@include('common.rooms-preview')
+
+<!-- Amenities Preview Section (Common Component) -->
+@include('common.amenities-preview')
+
+<!-- Testimonials Preview Section (Common Component) -->
+@include('common.testimonials-preview')
+
+<!-- Gallery Preview Section (Common Component) -->
+@include('common.gallery-preview')
+
+<!-- Instagram Section (Common Component) -->
+@include('common.instagram-section')
+
+<!-- Visit Hotel Kiran Palace Section (Common Component) -->
+@include('common.visit-section')
 @endsection
 
