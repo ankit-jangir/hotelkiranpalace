@@ -33,6 +33,9 @@
     @include('common.header')
 
     <main>
+        @if(!request()->routeIs('home'))
+            @include('common.hero-section')
+        @endif
         @yield('content')
     </main>
 
