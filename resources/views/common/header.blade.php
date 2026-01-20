@@ -88,7 +88,7 @@
 
         <!-- Book Button (Right Side - Desktop & Mobile) -->
         <div class="d-flex align-items-center ms-auto ms-lg-3 flex-shrink-0">
-            <a href="{{ route('contact') }}" class="book-btn btn rounded-pill px-2 px-md-3 px-lg-4 py-2 position-relative overflow-hidden text-decoration-none" style="background: rgb(255, 161, 0); border: none; color: white; font-weight: 600; font-size: 0.75rem; white-space: nowrap; transition: all 0.4s ease; box-shadow: 0 2px 4px rgba(255, 161, 0, 0.2); min-width: 100px; height: 38px; display: inline-flex; align-items: center; justify-content: center;">
+            <a href="{{ route('contact') }}" class="book-btn btn rounded-lg px-2 px-md-3 px-lg-4 py-2 position-relative overflow-hidden text-decoration-none" style="background: rgb(255, 161, 0); border: none; color: white; font-weight: 600; font-size: 0.75rem; white-space: nowrap; transition: all 0.4s ease; box-shadow: 0 2px 4px rgba(255, 161, 0, 0.2); min-width: 100px; height: 38px; display: inline-flex; align-items: center; justify-content: center;">
                 <span class="position-relative" style="z-index: 1; font-size: inherit;">Book Your Stay</span>
             </a>
         </div>

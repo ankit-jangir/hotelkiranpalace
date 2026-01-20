@@ -172,6 +172,8 @@ img[loading="lazy"] {
    ======================================== */
 body {
     padding-top: 70px;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 /* ========================================
