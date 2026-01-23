@@ -1,87 +1,108 @@
 @extends('common.layout')
 
-@section('title', 'Terms & Conditions - Hotel Kiran Palace')
+@section('title', 'Terms & Conditions | Hotel Kiran Palace')
 
 @section('content')
-<div class="container my-5 kp-terms">
 
-    <!-- Title -->
-    <div class="kp-terms-header">
-        <h1>Terms & Conditions</h1>
-        <p>
-            These terms and conditions outline the rules and regulations for
-            staying at <strong>Hotel Kiran Palace</strong>.
-        </p>
+
+
+<!-- CONTENT SECTION -->
+<section class="kp-content py-5">
+    <div class="container">
+
+        <div class="kp-card">
+
+            <!-- DOWNLOAD PDF -->
+            <div class="kp-download text-end mb-4">
+                <a href="{{ asset('terms/Hotel-Kiran-Palace-Terms.pdf') }}" class="btn kp-btn-orange" download>
+                    Download Terms (PDF)
+                </a>
+            </div>
+
+            <p class="kp-intro">
+                These Terms and Conditions govern your stay, booking, and use of
+                services at <strong>Hotel Kiran Palace</strong>. By booking or
+                staying with us, you agree to comply with these terms.
+            </p>
+
+            <h3>1. Acceptance of Terms</h3>
+            <p>
+                By accessing our website or availing hotel services, you agree
+                to be bound by these Terms & Conditions and all applicable laws.
+            </p>
+
+            <h3>2. Booking & Reservation Policy</h3>
+            <ul>
+                <li>All reservations are subject to availability</li>
+                <li>Valid government-issued ID is mandatory at check-in</li>
+                <li>Hotel reserves the right to refuse accommodation</li>
+            </ul>
+
+            <h3>3. Pricing & Payment</h3>
+            <ul>
+                <li>Room tariffs are subject to change without prior notice</li>
+                <li>Accepted payment modes include cash and digital payments</li>
+                <li>Advance payment may be required for confirmed bookings</li>
+            </ul>
+
+            <h3>4. Cancellation & Refund Policy</h3>
+            <p>
+                Cancellations made at least 24 hours before check-in may be
+                eligible for a refund. Late cancellations or no-shows may
+                attract charges.
+            </p>
+
+            <h3>5. Check-in & Check-out</h3>
+            <ul>
+                <li>Check-in time: <strong>2:00 PM</strong></li>
+                <li>Check-out time: <strong>12:00 PM</strong></li>
+                <li>Early check-in / late check-out subject to availability</li>
+            </ul>
+
+            <h3>6. Guest Responsibilities</h3>
+            <p>
+                Guests must behave responsibly and respect hotel property.
+                Any damage caused will be chargeable to the guest.
+            </p>
+
+            <h3>7. Hotel Services & Facilities</h3>
+            <ul>
+                <li>Services are provided as per hotel policies</li>
+                <li>Outside food may be restricted</li>
+                <li>Hotel reserves the right to modify services</li>
+            </ul>
+
+            <h3>8. Safety & Security</h3>
+            <p>
+                Guests are responsible for their personal belongings.
+                Hotel Kiran Palace shall not be liable for loss or theft.
+            </p>
+
+            <h3>9. Force Majeure</h3>
+            <p>
+                The hotel shall not be responsible for service disruption due to
+                events beyond reasonable control including natural disasters,
+                government regulations, or emergencies.
+            </p>
+
+            <h3>10. Governing Law</h3>
+            <p>
+                These terms shall be governed by the laws of India. Any disputes
+                shall be subject to the jurisdiction of local courts.
+            </p>
+
+            <h3>11. Modifications to Terms</h3>
+            <p>
+                Hotel Kiran Palace reserves the right to update these terms at
+                any time without prior notice.
+            </p>
+
+            <p class="kp-date">
+                <strong>Last Updated:</strong> {{ date('F Y') }}
+            </p>
+
+        </div>
     </div>
+</section>
 
-    <!-- Download PDF -->
-    <div class="kp-terms-download">
-        <a href="{{ asset('terms/Hotel-Kiran-Palace-Terms.pdf') }}">
-            Download Terms as PDF
-        </a>
-    </div>
-
-    <!-- Content -->
-    <div class="kp-terms-body">
-
-        <h3>1. Acceptance of Terms</h3>
-        <p>
-            By accessing our website or staying at Hotel Kiran Palace, you agree
-            to comply with these terms and all applicable local laws.
-        </p>
-
-        <h3>2. Booking & Reservation</h3>
-        <p>
-            All bookings are subject to availability and confirmation. Valid
-            government identification is required at check-in.
-        </p>
-
-        <h3>3. Payment Policy</h3>
-        <p>
-            Payments can be made by cash or digital modes accepted by the hotel.
-            Advance payment may be required for certain bookings.
-        </p>
-
-        <h3>4. Cancellation Policy</h3>
-        <p>
-            Cancellations made 24 hours before check-in may be eligible for a
-            refund. Late cancellations may attract charges.
-        </p>
-
-        <h3>5. Check-in & Check-out</h3>
-        <p>
-            Check-in time is 2:00 PM and check-out time is 12:00 PM. Early
-            check-in or late check-out is subject to availability.
-        </p>
-
-        <h3>6. Guest Conduct</h3>
-        <p>
-            Guests are expected to maintain decorum. Any damage to hotel
-            property will be charged to the guest.
-        </p>
-
-        <h3>7. Food & Services</h3>
-        <p>
-            Food services are available as per hotel timings. Outside food may
-            be restricted.
-        </p>
-
-        <h3>8. Liability</h3>
-        <p>
-            The hotel shall not be responsible for loss or damage to personal
-            belongings of guests.
-        </p>
-
-        <h3>9. Force Majeure</h3>
-        <p>
-            The hotel shall not be liable for failure to provide services due to
-            events beyond its control.
-        </p>
-
-        <p class="kp-terms-date">
-            Last updated: {{ date('F Y') }}
-        </p>
-
-    </div>
-</div>
 @endsection

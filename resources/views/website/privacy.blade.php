@@ -1,64 +1,102 @@
 @extends('common.layout')
 
-@section('title', 'Privacy Policy - Hotel Kiran Place')
+@section('title', 'Privacy Policy | Hotel Kiran Place')
 
 @section('content')
-<div class="container my-5">
-    <h1 class="mb-4">Privacy Policy</h1>
-    
-    <div class="row">
-        <div class="col-md-12">
+
+
+<!-- CONTENT -->
+<section class="privacy-content py-5">
+    <div class="container">
+        <div class="privacy-card">
+
+            <p class="intro-text">
+                At <strong>Hotel Kiran Place</strong>, we are committed to protecting your personal information.
+                This Privacy Policy explains how we collect, use, and safeguard your data when you visit our
+                website or stay with us.
+            </p>
+
             <h3>1. Information We Collect</h3>
-            <p>We collect information that you provide directly to us, including:</p>
+            <p>We may collect the following personal information:</p>
             <ul>
-                <li>Name, email address, phone number</li>
-                <li>Payment information</li>
-                <li>Booking preferences and history</li>
-                <li>Identification documents (for check-in purposes)</li>
+                <li>Full name, email address, phone number</li>
+                <li>Government-issued ID proof (as per hotel regulations)</li>
+                <li>Payment and billing details</li>
+                <li>Room booking history and preferences</li>
+                <li>IP address, browser type, and device information</li>
             </ul>
 
-            <h3 class="mt-4">2. How We Use Your Information</h3>
-            <p>We use the information we collect to:</p>
+            <h3>2. How We Use Your Information</h3>
             <ul>
-                <li>Process and manage your reservations</li>
-                <li>Communicate with you about your stay</li>
-                <li>Send you promotional offers and updates (with your consent)</li>
-                <li>Improve our services and guest experience</li>
-                <li>Comply with legal obligations</li>
+                <li>To confirm and manage hotel reservations</li>
+                <li>For check-in, verification, and security purposes</li>
+                <li>To improve customer service and guest experience</li>
+                <li>To send booking confirmations and service updates</li>
+                <li>To comply with legal and regulatory requirements</li>
             </ul>
 
-            <h3 class="mt-4">3. Information Sharing</h3>
-            <p>We do not sell, trade, or rent your personal information to third parties. We may share information only in the following circumstances:</p>
+            <h3>3. Sharing of Information</h3>
+            <p>
+                We do not sell or rent your personal data. Information may be shared only:
+            </p>
             <ul>
-                <li>With service providers who assist in our operations</li>
-                <li>When required by law or legal process</li>
-                <li>To protect our rights and safety</li>
+                <li>With trusted service providers (payment gateways, booking systems)</li>
+                <li>With law enforcement authorities if required by law</li>
+                <li>To protect the safety and rights of Hotel Kiran Place</li>
             </ul>
 
-            <h3 class="mt-4">4. Data Security</h3>
-            <p>We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.</p>
+            <h3>4. Data Security</h3>
+            <p>
+                We implement strict security measures to protect your data from unauthorized access,
+                misuse, or disclosure. However, no online transmission is 100% secure.
+            </p>
 
-            <h3 class="mt-4">5. Your Rights</h3>
-            <p>You have the right to:</p>
+            <h3>5. Cookies Policy</h3>
+            <p>
+                Our website uses cookies to enhance user experience and analyze website traffic.
+                You can disable cookies through your browser settings.
+            </p>
+
+            <h3>6. Guest Rights</h3>
             <ul>
-                <li>Access your personal information</li>
-                <li>Correct inaccurate information</li>
-                <li>Request deletion of your information</li>
-                <li>Opt-out of marketing communications</li>
+                <li>Access your personal data</li>
+                <li>Request correction or deletion</li>
+                <li>Opt-out of promotional communication</li>
             </ul>
 
-            <h3 class="mt-4">6. Cookies</h3>
-            <p>Our website uses cookies to enhance your browsing experience. You can control cookie preferences through your browser settings.</p>
+            <h3>7. Third-Party Links</h3>
+            <p>
+                Our website may contain links to third-party sites. We are not responsible for
+                the privacy practices of those websites.
+            </p>
 
-            <h3 class="mt-4">7. Changes to This Policy</h3>
-            <p>We may update this privacy policy from time to time. We will notify you of any changes by posting the new policy on this page.</p>
+            <h3>8. Policy Updates</h3>
+            <p>
+                Hotel Kiran Place reserves the right to update this policy at any time.
+                Changes will be posted on this page.
+            </p>
 
-            <h3 class="mt-4">8. Contact Us</h3>
-            <p>If you have questions about this privacy policy, please contact us at <a href="mailto:info@hotelkiranplace.com">info@hotelkiranplace.com</a></p>
+            <h3>9. Contact Information</h3>
+            <p>
+                If you have any questions regarding this Privacy Policy, please contact us:
+            </p>
+            <p>
+                📧 <a href="mailto:info@hotelkiranplace.com">info@hotelkiranplace.com</a>
+            </p>
 
-            <p class="mt-4"><strong>Last Updated:</strong> {{ date('F Y') }}</p>
+            <p class="last-updated">
+                <strong>Last Updated:</strong> {{ date('F Y') }}
+            </p>
+
+            <!-- PDF DOWNLOAD BUTTON -->
+            <div class="text-center mt-4">
+                <a href="{{ asset('privacy-policy-hotel-kiran-place.pdf') }}" class="btn btn-orange" download>
+                    Download Privacy Policy (PDF)
+                </a>
+            </div>
+
         </div>
     </div>
-</div>
-@endsection
+</section>
 
+@endsection
