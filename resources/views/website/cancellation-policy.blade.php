@@ -1,44 +1,95 @@
 @extends('common.layout')
 
-@section('title', 'Cancellation Policy - Hotel Kiran Place')
+@section('title', 'Cancellation Policy | Hotel Kiran Place')
 
 @section('content')
-<div class="container my-5">
-    <h1 class="mb-4">Cancellation Policy</h1>
-    
-    <div class="row">
-        <div class="col-md-12">
+
+
+
+<!-- CONTENT -->
+<section class="cp-section py-5">
+    <div class="container">
+        <div class="cp-card">
+
+            <p class="cp-intro">
+                At <strong>Hotel Kiran Place</strong>, we understand that plans can change.
+                This Cancellation Policy explains the terms applicable to cancellations,
+                refunds, and no-shows.
+            </p>
+
             <h3>1. Cancellation Timeframes</h3>
-            <p>Cancellations made at least 48 hours before the scheduled check-in time will receive a full refund. Cancellations made less than 48 hours before check-in may be subject to charges.</p>
+            <p>
+                Reservations cancelled at least <strong>48 hours</strong> prior to the
+                scheduled check-in time are eligible for a full refund.
+                Cancellations made after this period may incur charges.
+            </p>
 
-            <h3 class="mt-4">2. Cancellation Charges</h3>
-            <ul>
-                <li><strong>More than 48 hours:</strong> Full refund (100%)</li>
-                <li><strong>24-48 hours before check-in:</strong> 50% of total booking amount</li>
-                <li><strong>Less than 24 hours:</strong> No refund applicable</li>
-            </ul>
+            <h3>2. Cancellation Charges</h3>
+            <div class="cp-table-wrapper">
+                <table class="cp-table">
+                    <tr>
+                        <th>Cancellation Period</th>
+                        <th>Refund Amount</th>
+                    </tr>
+                    <tr>
+                        <td>More than 48 hours before check-in</td>
+                        <td>100% Refund</td>
+                    </tr>
+                    <tr>
+                        <td>24 – 48 hours before check-in</td>
+                        <td>50% Refund</td>
+                    </tr>
+                    <tr>
+                        <td>Less than 24 hours before check-in</td>
+                        <td>No Refund</td>
+                    </tr>
+                </table>
+            </div>
 
-            <h3 class="mt-4">3. No-Show Policy</h3>
-            <p>Guests who fail to check in on the scheduled date without prior cancellation will be charged for the entire stay as per the no-show policy.</p>
+            <h3>3. No-Show Policy</h3>
+            <p>
+                Guests who do not arrive on the scheduled date without prior
+                cancellation will be charged for the full booking amount.
+            </p>
 
-            <h3 class="mt-4">4. Early Check-out</h3>
-            <p>Early check-out requests will be processed, but guests may be liable for charges as per the cancellation policy based on the notice period provided.</p>
+            <h3>4. Early Check-out</h3>
+            <p>
+                Early departures may be subject to cancellation charges depending
+                on the notice period provided.
+            </p>
 
-            <h3 class="mt-4">5. Refund Processing</h3>
-            <p>Refunds for eligible cancellations will be processed within 7-14 business days to the original payment method used during booking.</p>
+            <h3>5. Refund Processing</h3>
+            <p>
+                Eligible refunds will be processed within <strong>7–14 business days</strong>
+                to the original payment method used at the time of booking.
+            </p>
 
-            <h3 class="mt-4">6. Non-Refundable Bookings</h3>
-            <p>Special offers, promotional rates, or packages marked as "Non-Refundable" cannot be cancelled or modified and are not eligible for refunds under any circumstances.</p>
+            <h3>6. Non-Refundable Bookings</h3>
+            <p>
+                Promotional rates, special packages, or discounted bookings marked
+                as <strong>Non-Refundable</strong> cannot be cancelled or refunded.
+            </p>
 
-            <h3 class="mt-4">7. Force Majeure</h3>
-            <p>In case of exceptional circumstances beyond our control (natural disasters, government restrictions, etc.), we will work with guests to find suitable alternatives or provide full refunds.</p>
+            <h3>7. Force Majeure</h3>
+            <p>
+                In case of unforeseen circumstances such as natural disasters,
+                government restrictions, or emergencies, Hotel Kiran Place will
+                work with guests to provide suitable alternatives or refunds.
+            </p>
 
-            <h3 class="mt-4">8. How to Cancel</h3>
-            <p>To cancel your booking, please contact our reservations team via phone, email, or through our online booking system. Cancellation requests must be confirmed by our team to be valid.</p>
+            <h3>8. How to Cancel a Booking</h3>
+            <p>
+                To cancel your reservation, please contact our reservations team
+                via phone, email, or through our official website.
+                A cancellation is valid only after confirmation from our team.
+            </p>
 
-            <p class="mt-4"><strong>Last Updated:</strong> {{ date('F Y') }}</p>
+            <p class="cp-date">
+                <strong>Last Updated:</strong> {{ date('F Y') }}
+            </p>
+
         </div>
     </div>
-</div>
-@endsection
+</section>
 
+@endsection

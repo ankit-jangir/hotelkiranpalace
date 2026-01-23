@@ -105,7 +105,7 @@
                                 <i class="fas fa-tv me-2"></i>
                                 <span>32" LED TV with satellite channels</span>
                             </div>
-                        </div>
+                        </div>  
                         <p class="room-member-rates mb-2">Member Rates starting from</p>
                         <div class="room-price-full mb-3">
                             <span class="room-price">₹8,500</span><span class="room-price-suffix">/Night</span>
