@@ -38,6 +38,28 @@ class WebsiteController extends Controller
 
     public function contactSubmit(Request $request)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'country_code' => 'required|string|max:10',
+            'room_type' => 'nullable|string|max:255',
+            'checkin_date' => 'nullable|date',
+            'checkout_date' => 'nullable|date|after_or_equal:checkin_date',
+            'comments' => 'nullable|string',
+        ]);
+
+        \App\Models\Contact::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'country_code' => $request->country_code ?? '+91',
+            'phone' => $request->phone,
+            'room_type' => $request->room_type,
+            'checkin_date' => $request->checkin_date,
+            'checkout_date' => $request->checkout_date,
+            'comments' => $request->comments,
+        ]);
+
         return back()->with('success', 'Thank you for your message. We will get back to you soon!');
     }
 
