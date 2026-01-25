@@ -3,73 +3,115 @@
 @section('title', 'Rooms & Tariff - Hotel Kiran Place')
 
 @section('content')
+
+@php
+$rooms = [
+[
+'slug' => 'deluxe-room',
+'image' => '../../../images/hero_section_img3.jpg',
+'price' => '₹2,500',
+'title' => 'Deluxe Room',
+'desc' => 'Beautifully designed room with modern furnishings, offering premium comfort for a relaxing stay.',
+'features' => ['King Size Bed', 'Free WiFi', 'AC', '32” TV'],
+],
+[
+'slug' => 'Suite room',
+'image' => '../../../images/rooms-1.jpg',
+'price' => '₹5,000',
+'title' => 'Suite Room',
+'desc' => 'Luxury suite with elegant interiors, separate seating area and premium amenities.',
+'features' => ['King Size Bed', 'Living Area', 'Mini Bar', 'Free WiFi'],
+],
+[
+'slug' => 'Double room',
+'image' => '../../../images/rooms-2.jpg',
+'price' => '₹8,000',
+'title' => 'Double Room',
+'desc' => 'Luxury suite with elegant interiors, separate seating area and premium amenities.',
+'features' => ['King Size Bed', 'AC', 'TV', 'Free WiFi'],
+],
+];
+@endphp
+
 <div class="container my-5">
     <h1 class="text-center mb-5">Rooms & Tariff</h1>
-    
-    <div class="row">
-        <!-- Room 1 -->
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <img src="https://via.placeholder.com/400x300" class="card-img-top" alt="Deluxe Room">
-                <div class="card-body">
-                    <h5 class="card-title">Deluxe Room</h5>
-                    <p class="card-text">Spacious and comfortable room with all modern amenities. Perfect for couples and families.</p>
-                    <ul class="list-unstyled">
-                        <li><i class="fas fa-check text-success"></i> King Size Bed</li>
-                        <li><i class="fas fa-check text-success"></i> Free WiFi</li>
-                        <li><i class="fas fa-check text-success"></i> AC</li>
-                        <li><i class="fas fa-check text-success"></i> TV</li>
-                    </ul>
-                    <p class="h4 text-primary mt-3">₹2,500/night</p>
-                </div>
-            </div>
+
+    @foreach($rooms as $index => $room)
+    <div class="room-row mb-5 {{ $index % 2 !== 0 ? 'reverse' : '' }}">
+        <div class="room-image">
+            <img src="{{ asset($room['image']) }}" alt="{{ $room['title'] }}">
         </div>
 
-        <!-- Room 2 -->
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <img src="https://via.placeholder.com/400x300" class="card-img-top" alt="Suite Room">
-                <div class="card-body">
-                    <h5 class="card-title">Suite Room</h5>
-                    <p class="card-text">Luxury suite with separate living area and premium amenities for an unforgettable experience.</p>
-                    <ul class="list-unstyled">
-                        <li><i class="fas fa-check text-success"></i> King Size Bed</li>
-                        <li><i class="fas fa-check text-success"></i> Living Room</li>
-                        <li><i class="fas fa-check text-success"></i> Free WiFi</li>
-                        <li><i class="fas fa-check text-success"></i> Mini Bar</li>
-                    </ul>
-                    <p class="h4 text-primary mt-3">₹5,000/night</p>
-                </div>
-            </div>
-        </div>
+        <div class="room-card">
+            <span class="room-price">From {{ $room['price'] }} / night</span>
+            <h3>{{ $room['title'] }}</h3>
+            <p>{{ $room['desc'] }}</p>
 
-        <!-- Room 3 -->
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <img src="https://via.placeholder.com/400x300" class="card-img-top" alt="Executive Room">
-                <div class="card-body">
-                    <h5 class="card-title">Executive Room</h5>
-                    <p class="card-text">Business-class room designed for corporate travelers with work desk and high-speed internet.</p>
-                    <ul class="list-unstyled">
-                        <li><i class="fas fa-check text-success"></i> Queen Size Bed</li>
-                        <li><i class="fas fa-check text-success"></i> Work Desk</li>
-                        <li><i class="fas fa-check text-success"></i> High-Speed WiFi</li>
-                        <li><i class="fas fa-check text-success"></i> Coffee Maker</li>
-                    </ul>
-                    <p class="h4 text-primary mt-3">₹3,500/night</p>
-                </div>
+            <div class="room-features">
+                @foreach($room['features'] as $feature)
+                <span>{{ $feature }}</span>
+                @endforeach
+            </div>
+
+            <div class="room-actions">
+                <a href="{{ route('contact') }}" class="btn-book">Book Now</a>
+                <a href="{{ route('room.detail', $room['slug']) }}" class="btn-link">
+                    Read more →
+                </a>
+
             </div>
         </div>
     </div>
 
-    <div class="row mt-5">
-        <div class="col-md-12">
-            <div class="alert alert-info">
-                <h5>Note:</h5>
-                <p class="mb-0">Rates are subject to change. Please contact us for current pricing and availability. All rooms include complimentary breakfast and access to hotel facilities.</p>
-            </div>
-        </div>
-    </div>
+
+    @endforeach
+
+
+
+
 </div>
-@endsection
+<!-- MAIN FACILITIES -->
+<section class="main-facilities">
+    <div class="facilities-overlay"></div>
 
+    <div class="container">
+        <div class="facilities-heading text-center">
+            <span>Hotel Kiran Palace</span>
+            <h2>Main Facilities</h2>
+        </div>
+
+        <div class="row text-center facilities-row">
+
+            <div class="col-md-3 col-6 mb-4">
+                <div class="facility-item">
+                    <i class="fas fa-parking"></i>
+                    <h6>Private Parking</h6>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6 mb-4">
+                <div class="facility-item">
+                    <i class="fas fa-wifi"></i>
+                    <h6>High Speed Wifi</h6>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6 mb-4">
+                <div class="facility-item">
+                    <i class="fas fa-utensils"></i>
+                    <h6>Bar & Restaurant</h6>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-6 mb-4">
+                <div class="facility-item">
+                    <i class="fas fa-headset"></i>
+                    <h6>24×7 Service</h6>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@endsection

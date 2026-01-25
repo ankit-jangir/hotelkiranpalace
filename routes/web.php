@@ -17,6 +17,7 @@ Route::get('/terms', [WebsiteController::class, 'terms'])->name('terms');
 Route::get('/privacy', [WebsiteController::class, 'privacy'])->name('privacy');
 Route::get('/faq', [WebsiteController::class, 'faq'])->name('faq');
 Route::get('/blog', [WebsiteController::class, 'blog'])->name('blog');
+Route::get('/blogdetail', [WebsiteController::class, 'blogdetail'])->name('website.blogdetail');
 Route::get('/booking-policy', [WebsiteController::class, 'bookingPolicy'])->name('booking.policy');
 Route::get('/cancellation-policy', [WebsiteController::class, 'cancellationPolicy'])->name('cancellation.policy');
 
