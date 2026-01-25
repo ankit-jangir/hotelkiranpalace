@@ -9,20 +9,25 @@
 <!-- Auto Show Session Toasts (Blade PHP - calls toast function from main.js) -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        @if(session('success'))
-            toast('success', '{{ session('success') }}');
-        @endif
+        // Use window.toast if available, otherwise try toast
+        const showToast = (typeof window.toast === 'function') ? window.toast : (typeof toast === 'function' ? toast : null);
+        
+        if (showToast) {
+            @if(session('success'))
+                showToast('success', '{{ session('success') }}');
+            @endif
 
-        @if(session('error'))
-            toast('error', '{{ session('error') }}');
-        @endif
+            @if(session('error'))
+                showToast('error', '{{ session('error') }}');
+            @endif
 
-        @if(session('warning'))
-            toast('warning', '{{ session('warning') }}');
-        @endif
+            @if(session('warning'))
+                showToast('warning', '{{ session('warning') }}');
+            @endif
 
-        @if(session('info'))
-            toast('info', '{{ session('info') }}');
-        @endif
+            @if(session('info'))
+                showToast('info', '{{ session('info') }}');
+            @endif
+        }
     });
 </script>
