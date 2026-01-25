@@ -68,7 +68,7 @@
                 </div>
                 
                 <!-- Buttons -->
-                <div class="visit-buttons d-flex flex-column flex-sm-row gap-3 mt-4">
+                <div class="visit-buttons d-flex flex-column  gap-3 mt-4">
                     <a href="https://www.google.com/maps/dir/?api=1&destination=123+Royal+Street+Palace+Road+Luxury+District+City+400001" target="_blank" rel="noopener noreferrer" class="btn visit-btn-directions position-relative overflow-hidden">
                         <span class="position-relative z-index-1 d-flex align-items-center justify-content-center">
                             <i class="fas fa-map-marker-alt me-2"></i>

@@ -112,7 +112,7 @@
     <div class="offcanvas-body p-0">
         <ul class="list-unstyled mb-0" style="padding: 0;">
             <li class="border-bottom">
-                <a class="d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none position-relative {{ request()->routeIs('home') ? 'mobile-active' : '' }}" href="{{ route('home') }}" style="color: {{ request()->routeIs('home') ? '#ff6b35' : '#333' }}; font-weight: 500;" data-bs-dismiss="offcanvas">
+                <a class="d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none position-relative {{ request()->routeIs('home') ? 'mobile-active' : '' }}" href="{{ route('home') }}" style="color: {{ request()->routeIs('home') ? '#ff6b35' : '#333' }}; font-weight: 500;" >
                     <span>Home</span>
                     @if(request()->routeIs('home'))
                         <span class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; background: #ff6b35; border-radius: 50%;"></span>
@@ -120,7 +120,7 @@
                 </a>
             </li>
             <li class="border-bottom">
-                <a class="d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none position-relative {{ request()->routeIs('about') ? 'mobile-active' : '' }}" href="{{ route('about') }}" style="color: {{ request()->routeIs('about') ? '#ff6b35' : '#333' }}; font-weight: 500;" data-bs-dismiss="offcanvas">
+                <a class="d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none position-relative {{ request()->routeIs('about') ? 'mobile-active' : '' }}" href="{{ route('about') }}" style="color: {{ request()->routeIs('about') ? '#ff6b35' : '#333' }}; font-weight: 500;" >
                     <span>About</span>
                     @if(request()->routeIs('about'))
                         <span class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; background: #ff6b35; border-radius: 50%;"></span>
@@ -137,14 +137,14 @@
                 </a>
                 <div class="collapse" id="mobileRoomsCollapse">
                     <ul class="list-unstyled bg-light mb-0">
-                        <li><a class="d-block py-2 px-5 text-decoration-none" href="{{ route('rooms') }}" style="color: #666; font-size: 0.9rem;" data-bs-dismiss="offcanvas">View All Rooms</a></li>
-                        <li><a class="d-block py-2 px-5 text-decoration-none" href="{{ route('rooms') }}#deluxe" style="color: #666; font-size: 0.9rem;" data-bs-dismiss="offcanvas">Deluxe Rooms</a></li>
-                        <li><a class="d-block py-2 px-5 text-decoration-none" href="{{ route('rooms') }}#suite" style="color: #666; font-size: 0.9rem;" data-bs-dismiss="offcanvas">Suite Rooms</a></li>
+                        <li><a class="d-block py-2 px-5 text-decoration-none" href="{{ route('rooms') }}" style="color: #666; font-size: 0.9rem;" >View All Rooms</a></li>
+                        <li><a class="d-block py-2 px-5 text-decoration-none" href="{{ route('rooms') }}#deluxe" style="color: #666; font-size: 0.9rem;" >Deluxe Rooms</a></li>
+                        <li><a class="d-block py-2 px-5 text-decoration-none" href="{{ route('rooms') }}#suite" style="color: #666; font-size: 0.9rem;" >Suite Rooms</a></li>
                     </ul>
                 </div>
             </li>
             <li class="border-bottom">
-                <a class="d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none position-relative {{ request()->routeIs('amenities') ? 'mobile-active' : '' }}" href="{{ route('amenities') }}" style="color: {{ request()->routeIs('amenities') ? '#ff6b35' : '#333' }}; font-weight: 500;" data-bs-dismiss="offcanvas">
+                <a class="d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none position-relative {{ request()->routeIs('amenities') ? 'mobile-active' : '' }}" href="{{ route('amenities') }}" style="color: {{ request()->routeIs('amenities') ? '#ff6b35' : '#333' }}; font-weight: 500;" >
                     <span>Amenities</span>
                     @if(request()->routeIs('amenities'))
                         <span class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; background: #ff6b35; border-radius: 50%;"></span>
@@ -152,7 +152,7 @@
                 </a>
             </li>
             <li class="border-bottom">
-                <a class="d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none position-relative {{ request()->routeIs('gallery') ? 'mobile-active' : '' }}" href="{{ route('gallery') }}" style="color: {{ request()->routeIs('gallery') ? '#ff6b35' : '#333' }}; font-weight: 500;" data-bs-dismiss="offcanvas">
+                <a class="d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none position-relative {{ request()->routeIs('gallery') ? 'mobile-active' : '' }}" href="{{ route('gallery') }}" style="color: {{ request()->routeIs('gallery') ? '#ff6b35' : '#333' }}; font-weight: 500;" >
                     <span>Photo & Gallery</span>
                     @if(request()->routeIs('gallery'))
                         <span class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; background: #ff6b35; border-radius: 50%;"></span>
@@ -160,7 +160,7 @@
                 </a>
             </li>
             <li class="border-bottom">
-                <a class="d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none position-relative {{ request()->routeIs('contact') ? 'mobile-active' : '' }}" href="{{ route('contact') }}" style="color: {{ request()->routeIs('contact') ? '#ff6b35' : '#333' }}; font-weight: 500;" data-bs-dismiss="offcanvas">
+                <a class="d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none position-relative {{ request()->routeIs('contact') ? 'mobile-active' : '' }}" href="{{ route('contact') }}" style="color: {{ request()->routeIs('contact') ? '#ff6b35' : '#333' }}; font-weight: 500;" >
                     <span>Contact</span>
                     @if(request()->routeIs('contact'))
                         <span class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; background: #ff6b35; border-radius: 50%;"></span>
@@ -168,7 +168,7 @@
                 </a>
             </li>
             <li class="border-bottom">
-                <a class="d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none position-relative {{ request()->routeIs('blog') ? 'mobile-active' : '' }}" href="{{ route('blog') }}" style="color: {{ request()->routeIs('blog') ? '#ff6b35' : '#333' }}; font-weight: 500;" data-bs-dismiss="offcanvas">
+                <a class="d-flex align-items-center justify-content-between py-3 px-4 text-decoration-none position-relative {{ request()->routeIs('blog') ? 'mobile-active' : '' }}" href="{{ route('blog') }}" style="color: {{ request()->routeIs('blog') ? '#ff6b35' : '#333' }}; font-weight: 500;" >
                     <span>Blog</span>
                     @if(request()->routeIs('blog'))
                         <span class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; background: #ff6b35; border-radius: 50%;"></span>
@@ -185,10 +185,10 @@
                 </a>
                 <div class="collapse {{ request()->routeIs('terms', 'privacy', 'faq') ? 'show' : '' }}" id="mobileMoreCollapse">
                     <ul class="list-unstyled bg-light mb-0">
-                        <li><a class="d-block py-2 px-5 text-decoration-none" href="#" style="color: #666; font-size: 0.9rem;" data-bs-dismiss="offcanvas">Club</a></li>
-                        <li><a class="d-block py-2 px-5 text-decoration-none {{ request()->routeIs('terms') ? 'fw-bold' : '' }}" href="{{ route('terms') }}" style="color: {{ request()->routeIs('terms') ? '#ff6b35' : '#666' }}; font-size: 0.9rem;" data-bs-dismiss="offcanvas">Terms & Conditions</a></li>
-                        <li><a class="d-block py-2 px-5 text-decoration-none {{ request()->routeIs('privacy') ? 'fw-bold' : '' }}" href="{{ route('privacy') }}" style="color: {{ request()->routeIs('privacy') ? '#ff6b35' : '#666' }}; font-size: 0.9rem;" data-bs-dismiss="offcanvas">Privacy Policy</a></li>
-                        <li><a class="d-block py-2 px-5 text-decoration-none {{ request()->routeIs('faq') ? 'fw-bold' : '' }}" href="{{ route('faq') }}" style="color: {{ request()->routeIs('faq') ? '#ff6b35' : '#666' }}; font-size: 0.9rem;" data-bs-dismiss="offcanvas">FAQ</a></li>
+                        <li><a class="d-block py-2 px-5 text-decoration-none" href="#" style="color: #666; font-size: 0.9rem;" >Club</a></li>
+                        <li><a class="d-block py-2 px-5 text-decoration-none {{ request()->routeIs('terms') ? 'fw-bold' : '' }}" href="{{ route('terms') }}" style="color: {{ request()->routeIs('terms') ? '#ff6b35' : '#666' }}; font-size: 0.9rem;" >Terms & Conditions</a></li>
+                        <li><a class="d-block py-2 px-5 text-decoration-none {{ request()->routeIs('privacy') ? 'fw-bold' : '' }}" href="{{ route('privacy') }}" style="color: {{ request()->routeIs('privacy') ? '#ff6b35' : '#666' }}; font-size: 0.9rem;" >Privacy Policy</a></li>
+                        <li><a class="d-block py-2 px-5 text-decoration-none {{ request()->routeIs('faq') ? 'fw-bold' : '' }}" href="{{ route('faq') }}" style="color: {{ request()->routeIs('faq') ? '#ff6b35' : '#666' }}; font-size: 0.9rem;" >FAQ</a></li>
                     </ul>
                 </div>
             </li>

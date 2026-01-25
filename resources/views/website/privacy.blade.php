@@ -10,6 +10,12 @@
     <div class="container">
         <div class="privacy-card">
 
+            <!-- PDF DOWNLOAD BUTTON -->
+            <div class=" text-end mb-4">
+                <a href="{{ asset('privacy-policy-hotel-kiran-place.pdf') }}" class="btn btn-orange" download>
+                    Download Privacy (PDF)
+                </a>
+            </div>
             <p class="intro-text">
                 At <strong>Hotel Kiran Place</strong>, we are committed to protecting your personal information.
                 This Privacy Policy explains how we collect, use, and safeguard your data when you visit our
@@ -88,12 +94,6 @@
                 <strong>Last Updated:</strong> {{ date('F Y') }}
             </p>
 
-            <!-- PDF DOWNLOAD BUTTON -->
-            <div class="text-center mt-4">
-                <a href="{{ asset('privacy-policy-hotel-kiran-place.pdf') }}" class="btn btn-orange" download>
-                    Download Privacy Policy (PDF)
-                </a>
-            </div>
 
         </div>
     </div>
