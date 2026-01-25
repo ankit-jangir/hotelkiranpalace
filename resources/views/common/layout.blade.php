@@ -28,14 +28,6 @@
 </head>
 
 <body>
-    <!-- Page Loader -->
-    <div id="pageLoader" class="page-loader">
-        <div class="loader-content">
-            <div class="loader-spinner"></div>
-            <p class="loader-text">Loading...</p>
-        </div>
-    </div>
-
     @include('common.header')
 
     <main>
