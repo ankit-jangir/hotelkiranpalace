@@ -8442,6 +8442,74 @@ opacity: 0.95;
         top: 0;
         margin-bottom: 40px;
     }
+.luxury-scroll h2 {
+    font-size: 30px;
+}
+
+.amenities-list li {
+    font-size: 17px;
+}
+}
+
+.about-why {
+position: relative;
+padding: 100px 0;
+background-image: url("../images/hero_section_img3.jpg"); /* apni image path */
+background-size: cover;
+background-position: center;
+background-attachment: fixed; /* 🔥 scroll effect */
+}
+.about-why::before {
+content: "";
+position: absolute;
+inset: 0;
+background: rgba(0, 0, 0, 0.6);
+z-index: 1;
+}
+
+/* content upar rahe */
+.about-why .container {
+position: relative;
+z-index: 2;
+}
+
+/* heading color */
+.about-why h2 {
+color: #ffffff;
+font-weight: 700;
+margin-bottom: 40px;
+}
+
+.why-card {
+background: rgba(255, 255, 255, 0.95);
+padding: 32px 24px;
+border-radius: 16px;
+text-align: center;
+box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
+height: 100%;
+transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.why-card:hover {
+transform: translateY(-8px);
+box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+}
+.why-card h4 {
+color: #ff7a18;
+font-weight: 700;
+margin-bottom: 12px;
+}
+
+.why-card p {
+color: #444;
+}
+
+@media (max-width: 768px) {
+.about-why {
+    background-attachment: scroll;
+}
 }
 
 .about-journey {
@@ -8979,22 +9047,6 @@ height: 420px;
 border-radius: 22px;
 overflow: hidden;
 margin-bottom: 30px;
-    font-size: 48px;
-    font-weight: 700;
-}
-.hero-content p {
-    font-size: 16px;
-    opacity: 0.9;
-}
-
-/* ================= BLOG CARD ================= */
-.blog-card {
-    position: relative;
-    overflow: hidden;
-    border-radius: 12px;
-    border: 1px solid #eee;
-    background: #fff;
-    transition: transform 0.3s ease;
 }
 
 .blog-card:hover {
@@ -9005,6 +9057,13 @@ margin-bottom: 30px;
     width: 100%;
     height: 240px;
     object-fit: cover;
+width: 100%;
+height: 100%;
+object-fit: cover;
+transition: 0.6s;
+}
+.blog-card:hover img {
+transform: scale(1.1);
 }
 
 .blog-overlay {
@@ -9021,6 +9080,14 @@ margin-bottom: 30px;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+position: absolute;
+inset: 0;
+background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+padding: 30px;
+display: flex;
+flex-direction: column;
+justify-content: flex-end;
+color: #fff;
 }
 
 .blog-overlay span {
@@ -9032,12 +9099,18 @@ margin-bottom: 30px;
     font-weight: 600;
     margin-bottom: 6px;
     width: fit-content;
+background: #ff7a00;
+padding: 5px 14px;
+border-radius: 20px;
+width: max-content;
+font-size: 12px;
 }
 
 .blog-overlay h4 {
     font-size: 18px;
     font-weight: 600;
     margin-bottom: 4px;
+margin-top: 10px;
 }
 
 .blog-overlay p {
@@ -9049,6 +9122,8 @@ margin-bottom: 30px;
     color: #ffd2b0;
     font-size: 14px;
     text-decoration: none;
+color: #ffb366;
+text-decoration: none;
 }
 
 /* ================= SIDEBAR ================= */
@@ -9087,10 +9162,19 @@ margin-bottom: 30px;
 
 /* ================= PAGINATION ================= */
 .pagination-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 16px;
+display: flex;
+justify-content: center;
+align-items: center;
+gap: 20px;
+margin-top: 40px;
+}
+.pagination-wrapper button {
+border: none;
+background: #ff7a00;
+color: #fff;
+padding: 10px 18px;
+border-radius: 50%;
+font-size: 18px;
 }
 
 .pagination-wrapper button {
@@ -9117,12 +9201,17 @@ margin-bottom: 30px;
 .related-section {
     background: #fafafa;
     padding: 60px 0;
+background: #f8f8f8;
+padding: 70px 0;
 }
 
 .related-section h2 {
     font-size: 28px;
     font-weight: 600;
     color: #222;
+font-size: 2rem;
+font-weight: 700;
+color: #333;
 }
 
 .related-card {
@@ -9130,6 +9219,9 @@ margin-bottom: 30px;
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid #eee;
+transition:
+    transform 0.4s,
+    box-shadow 0.4s;
 }
 
 .related-card img {
@@ -10189,6 +10281,103 @@ object-fit: cover;
 
 .amenity-card::before {
     content: "";
+padding: 15px;
+}
+.related-card:hover {
+transform: translateY(-8px);
+box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+.related-card-img img {
+width: 100%;
+height: 280px;
+object-fit: cover;
+transition: transform 0.5s;
+}
+
+.related-card:hover img {
+transform: scale(1.1);
+}
+.related-card-overlay {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.3),
+    rgba(0, 0, 0, 0.6)
+);
+transition: background 0.4s;
+}
+.related-card:hover .related-card-overlay {
+background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.2),
+    rgba(0, 0, 0, 0.5)
+);
+}
+.related-card-text {
+position: absolute;
+bottom: 20px;
+left: 20px;
+color: #fff;
+}
+
+.related-card-text h5 {
+font-size: 1.3rem;
+font-weight: 700;
+margin-bottom: 0.5rem;
+}
+
+.related-card-text p {
+font-size: 0.9rem;
+margin-bottom: 0.5rem;
+}
+
+.related-card-text .btn {
+border: 1px solid #fff;
+color: #fff;
+transition: all 0.3s;
+}
+
+.related-card-text .btn:hover {
+background-color: #fff;
+color: #000;
+}
+.related-card-body {
+text-align: center;
+}
+.related-card-title {
+font-size: 1.25rem;
+font-weight: 600;
+margin-bottom: 0.5rem;
+}
+
+.related-card-desc {
+font-size: 0.9rem;
+margin-bottom: 0.5rem;
+}
+/* Add Blog Button */
+.admin-add-blog-btn {
+    background: rgb(255, 161, 0);
+    color: #ffffff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 4px rgba(255, 161, 0, 0.2);
+}
+
+.admin-add-blog-btn::before {
+    content: '';
     position: absolute;
     top: 0;
     left: -100%;
@@ -10447,9 +10636,92 @@ object-fit: cover;
     left: 0;
     width: 6px;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--orange);
+}
+
+.amenity-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(255, 122, 0, 0.25);
+}
+
+.amenity-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--orange-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.amenity-icon i {
+    font-size: 26px;
+    color: var(--orange);
+}
+
+.amenity-card h5 {
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text-dark);
+}
+
+.amenity-card p {
+    color: #666;
+    font-size: 15px;
+    margin: 0;
+    line-height: 1.6;
+}
+.amenities-royal-section {
+    padding: 80px 0;
+    background-color: #ffffff;
+}
+
+/* Left Content */
+.amenities-royal-content h2 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #d89c2f; /* Orange / Royal Gold */
+    margin-bottom: 20px;
+}
+
+.amenities-royal-content p {
+    font-size: 17px;
+    color: #444;
+    line-height: 1.8;
+    max-width: 520px;
+}
+
+/* Right Image */
+.amenities-royal-image {
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+}
+
+.amenities-royal-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.amenities-royal-image:hover img {
+    transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .amenities-royal-content h2 {
+        font-size: 28px;
+    }
+
+    .amenities-royal-section {
+        padding: 60px 0;
+    }
+    /* background: rgba(0, 0, 0, 0.5);
     z-index: 9998;
-    transition: opacity 0.3s ease; 
+    transition: opacity 0.3s ease; */
 }
 
 .admin-blog-panel-overlay.show {
