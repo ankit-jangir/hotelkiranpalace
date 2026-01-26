@@ -9,7 +9,7 @@
             $settings->staff_number_2 ?? '',
             $settings->staff_number_3 ?? '',
         ];
-        $departments = ['Manager', 'Hotel', 'Reception']; // updated headings
+        $departments = ['Manager', 'Hotel', 'Reception']; 
     @endphp
     @extends('common.layout')
 
@@ -274,7 +274,7 @@
     </div>
 </section>
 
-        <!-- Membership Card Section (Last Section) -->
+        <!-- Membership Card Sections (Last Section) -->
         {{-- @include('common.membership-card') --}}
 
     @endsection
