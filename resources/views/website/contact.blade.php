@@ -275,7 +275,7 @@
 </section>
 
         <!-- Membership Card Section (Last Section) -->
-        @include('common.membership-card')
+        {{-- @include('common.membership-card') --}}
 
     @endsection
 

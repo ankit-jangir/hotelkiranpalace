@@ -784,3 +784,76 @@ document
 
 // Gallery Functions
 // Gallery-related JavaScript has been moved to admin-gallery.js
+
+// roomdetail review modal js
+
+document
+    .getElementById("roomdetailSubmitReview")
+    .addEventListener("click", function () {
+        const modal = bootstrap.Modal.getInstance(
+            document.getElementById("roomdetailReviewModal"),
+        );
+        modal.hide();
+    });
+
+// gallery comon
+
+document.addEventListener("DOMContentLoaded", () => {
+    // MAIN SWIPER (page view)
+    const mainSwiper = new Swiper(".gallery-main-swiper", {
+        loop: true,
+        centeredSlides: true,
+        slidesPerView: 1.3,
+        spaceBetween: 24,
+        navigation: {
+            nextEl: ".main-next",
+            prevEl: ".main-prev",
+        },
+        breakpoints: {
+            768: { slidesPerView: 2 },
+            1024: { slidesPerView: 3 },
+        },
+    });
+
+    let modalSwiper;
+
+    const modal = document.getElementById("galleryModal");
+
+    // OPEN MODAL
+    document
+        .getElementById("openGalleryModal")
+        .addEventListener("click", () => {
+            modal.classList.remove("hidden");
+            document.body.style.overflow = "hidden";
+
+            if (!modalSwiper) {
+                modalSwiper = new Swiper(".gallery-modal-swiper", {
+                    loop: true,
+                    slidesPerView: 1,
+                    navigation: {
+                        nextEl: ".modal-next",
+                        prevEl: ".modal-prev",
+                    },
+                });
+            }
+        });
+
+    // CLOSE MODAL
+    document
+        .getElementById("closeGalleryModal")
+        .addEventListener("click", () => {
+            modal.classList.add("hidden");
+            document.body.style.overflow = "";
+        });
+});
+// Smooth fade on slide change (modal)
+modalSwiper?.on("slideChangeTransitionStart", () => {
+    document.querySelectorAll(".gallery-modal-swiper img").forEach((img) => {
+        img.style.opacity = ".6";
+    });
+});
+modalSwiper?.on("slideChangeTransitionEnd", () => {
+    document.querySelectorAll(".gallery-modal-swiper img").forEach((img) => {
+        img.style.opacity = "1";
+    });
+});

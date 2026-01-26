@@ -3,100 +3,88 @@
 @section('title', 'Amenities - Hotel Kiran Place')
 
 @section('content')
-<div class="container my-5">
-    <h1 class="text-center mb-5">Amenities</h1>
-    
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-wifi text-primary"></i> Free WiFi</h5>
-                    <p class="card-text">High-speed internet connection available throughout the hotel premises.</p>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-parking text-primary"></i> Free Parking</h5>
-                    <p class="card-text">Complimentary parking space available for all guests.</p>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-utensils text-primary"></i> Restaurant</h5>
-                    <p class="card-text">Multi-cuisine restaurant serving delicious meals throughout the day.</p>
-                </div>
-            </div>
-        </div>
+<!-- hero -->
 
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-swimming-pool text-primary"></i> Swimming Pool</h5>
-                    <p class="card-text">Refreshing swimming pool for relaxation and recreation.</p>
-                </div>
-            </div>
-        </div>
+<section class="amenities-royal-section">
+    <div class="container">
+        <div class="row align-items-center">
 
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-dumbbell text-primary"></i> Fitness Center</h5>
-                    <p class="card-text">Well-equipped gym with modern fitness equipment.</p>
+            <!-- Left Content -->
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="amenities-royal-content">
+                    <h2>Designed for Royal Comfort</h2>
+                    <p>
+                        At Hotel Kiran Palace, every amenity is crafted to deliver
+                        unmatched luxury, comfort and elegance. From indulgent
+                        spa experiences to royal dining and grand banquet halls,
+                        we ensure a majestic stay for every guest.
+                    </p>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-concierge-bell text-primary"></i> Room Service</h5>
-                    <p class="card-text">24/7 room service available for your convenience.</p>
+            <!-- Right Image -->
+            <div class="col-lg-6">
+                <div class="amenities-royal-image">
+                    <img src="{{ asset('/images/kiran-1.jpg') }}" alt="Hotel Kiran Palace">
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-spa text-primary"></i> Spa & Wellness</h5>
-                    <p class="card-text">Relax and rejuvenate with our spa and wellness services.</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-business-time text-primary"></i> Business Center</h5>
-                    <p class="card-text">Fully equipped business center for your work needs.</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-shuttle-van text-primary"></i> Airport Transfer</h5>
-                    <p class="card-text">Complimentary airport pickup and drop services available.</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-key text-primary"></i> Safe Deposit</h5>
-                    <p class="card-text">Secure locker facilities for your valuable belongings.</p>
-                </div>
-            </div>
         </div>
     </div>
-</div>
-@endsection
+</section>
 
+<section class="amenities-section">
+    <div class="container">
+
+        <div class="amenities-heading text-center mb-5">
+            <span>Hotel Kiran Palace</span>
+            <h1>Amenities & Facilities</h1>
+        </div>
+
+        <div class="row g-4">
+
+            @php
+            $amenities = [
+            ['icon' => 'fa-wifi', 'title' => 'Free WiFi', 'desc' => 'High-speed internet access available throughout the
+            hotel.'],
+            ['icon' => 'fa-parking', 'title' => 'Free Parking', 'desc' => 'Safe and spacious parking facility for all
+            guests.'],
+            ['icon' => 'fa-utensils', 'title' => 'Restaurant', 'desc' => 'Enjoy delicious multi-cuisine meals prepared
+            by expert chefs.'],
+            ['icon' => 'fa-swimming-pool', 'title' => 'Swimming Pool', 'desc' => 'Relax and refresh yourself in our
+            clean swimming pool.'],
+            ['icon' => 'fa-dumbbell', 'title' => 'Fitness Center', 'desc' => 'Modern gym equipment to keep you fit
+            during your stay.'],
+            ['icon' => 'fa-concierge-bell', 'title' => '24×7 Room Service', 'desc' => 'Round-the-clock room service for
+            your comfort.'],
+            ['icon' => 'fa-spa', 'title' => 'Spa & Wellness', 'desc' => 'Rejuvenate your body and mind with relaxing spa
+            services.'],
+            ['icon' => 'fa-briefcase', 'title' => 'Business Center', 'desc' => 'Fully equipped space for meetings and
+            work needs.'],
+            ['icon' => 'fa-shuttle-van', 'title' => 'Airport Transfer', 'desc' => 'Pickup & drop facility available on
+            request.'],
+            ['icon' => 'fa-key', 'title' => 'Safe Deposit', 'desc' => 'Secure lockers available for your valuable
+            belongings.'],
+            ];
+            @endphp
+
+            @foreach($amenities as $item)
+            <div class="col-lg-4 col-md-6">
+                <div class="amenity-card">
+                    <div class="amenity-icon">
+                        <i class="fas {{ $item['icon'] }}"></i>
+                    </div>
+                    <h5>{{ $item['title'] }}</h5>
+                    <p>{{ $item['desc'] }}</p>
+                </div>
+            </div>
+            @endforeach
+
+        </div>
+
+    </div>
+</section>
+
+@endsection
