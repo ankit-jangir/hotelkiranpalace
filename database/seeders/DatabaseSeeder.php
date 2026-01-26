@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // Seed dummy blog, gallery, subscriptions, contacts, hero sections and rooms
+        // Seed dummy blog, gallery, subscriptions, contacts, hero sections, rooms, admin settings and staff users
         $this->call([
             BlogSeeder::class,
             GallerySeeder::class,
@@ -33,6 +33,8 @@ class DatabaseSeeder extends Seeder
             ContactSeeder::class,
             HeroSectionSeeder::class,
             RoomSeeder::class,
+            AdminSettingSeeder::class,
+            StaffUserSeeder::class,
         ]);
     }
 }

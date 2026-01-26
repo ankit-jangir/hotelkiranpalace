@@ -417,6 +417,30 @@
                 margin-top: 0.3rem;
             }
 
+            .admin-rate-limit-timer {
+                background: #fff3cd;
+                border: 1px solid #ffc107;
+                border-radius: 8px;
+                padding: 0.75rem;
+                margin-bottom: 1rem;
+                text-align: center;
+                color: #856404;
+                font-size: 0.9rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .admin-rate-limit-timer i {
+                color: #ffc107;
+            }
+
+            .admin-login-btn:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none !important;
+            }
+
             .admin-login-card {
                 padding: 2rem 1.5rem;
                 border-radius: 12px;
@@ -512,6 +536,24 @@
                                     <div class="admin-invalid-feedback" id="passwordError"></div>
                                 </div>
 
+                                <!-- Login Type (Admin / Staff) -->
+                                <div class="admin-form-group">
+                                    <label class="admin-form-label d-block mb-1">Login as</label>
+                                    <div class="d-flex gap-3">
+                                        <label class="admin-form-check-label">
+                                            <input type="radio" name="login_type" value="admin" checked>
+                                            <span class="ms-1">Admin</span>
+                                        </label>
+                                        <label class="admin-form-check-label">
+                                            <input type="radio" name="login_type" value="staff">
+                                            <span class="ms-1">Staff</span>
+                                        </label>
+                                    </div>
+                                    <small class="text-muted d-block mt-1">
+                                        Staff login uses email or phone assigned in Staff settings.
+                                    </small>
+                                </div>
+
                                 <!-- Remember Me Checkbox -->
                                 <div class="admin-form-check">
                                     <input 
@@ -523,6 +565,12 @@
                                     <label class="admin-form-check-label" for="remember">
                                         Remember me
                                     </label>
+                                </div>
+
+                                <!-- Rate Limit Timer (Hidden by default) -->
+                                <div id="rateLimitTimer" class="admin-rate-limit-timer" style="display: none;">
+                                    <i class="fas fa-clock me-2"></i>
+                                    <span id="timerText">Please wait <span id="timerSeconds">60</span> seconds before trying again.</span>
                                 </div>
 
                                 <!-- Submit Button -->
@@ -561,6 +609,19 @@
             const emailSuccess = document.getElementById('emailSuccess');
             const passwordError = document.getElementById('passwordError');
             const loginBtn = document.getElementById('loginSubmitBtn');
+            const rateLimitTimer = document.getElementById('rateLimitTimer');
+            const timerText = document.getElementById('timerText');
+            const timerSeconds = document.getElementById('timerSeconds');
+            
+            // Check rate limit on page load
+            checkRateLimit();
+            
+            // Also check for rate limit in URL parameters (if redirected with error)
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('rate_limited') === 'true') {
+                const seconds = parseInt(urlParams.get('seconds')) || 60;
+                startRateLimitTimer(seconds);
+            }
 
             // Password Toggle
             passwordToggle.addEventListener('click', function() {
@@ -592,7 +653,7 @@
                 }
             });
 
-            // Password Validation
+            // Password Validation (simple - just check if not empty)
             passwordInput.addEventListener('input', function() {
                 const password = this.value;
                 
@@ -600,76 +661,107 @@
                     this.classList.remove('is-valid', 'is-invalid');
                     passwordError.textContent = '';
                 } else {
-                    const requirements = checkPasswordRequirements(password);
-                    const missingRequirements = [];
-                    
-                    if (!requirements.length) missingRequirements.push('at least 8 characters');
-                    if (!requirements.uppercase) missingRequirements.push('one uppercase letter');
-                    if (!requirements.lowercase) missingRequirements.push('one lowercase letter');
-                    if (!requirements.number) missingRequirements.push('one number');
-                    if (!requirements.special) missingRequirements.push('one special character');
-                    
-                    if (missingRequirements.length > 0) {
-                        this.classList.remove('is-valid');
-                        this.classList.add('is-invalid');
-                        passwordError.textContent = 'Password must contain: ' + missingRequirements.join(', ');
-                    } else {
-                        this.classList.remove('is-invalid');
-                        this.classList.add('is-valid');
-                        passwordError.textContent = '';
-                    }
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                    passwordError.textContent = '';
                 }
             });
 
-            // Password Requirements Check
-            function checkPasswordRequirements(password) {
-                const requirements = {
-                    length: password.length >= 8,
-                    uppercase: /[A-Z]/.test(password),
-                    lowercase: /[a-z]/.test(password),
-                    number: /[0-9]/.test(password),
-                    special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
-                };
-                return requirements;
+
+            // Use global toast function if available, otherwise fallback
+            function showToast(message, type = 'error') {
+                if (typeof window.toast === 'function') {
+                    window.toast(type, message);
+                } else if (typeof toast === 'function') {
+                    toast(type, message);
+                } else {
+                    // Fallback: Create toast element
+                    const toastEl = document.createElement('div');
+                    toastEl.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : 'success'} border-0`;
+                    toastEl.setAttribute('role', 'alert');
+                    toastEl.setAttribute('aria-live', 'assertive');
+                    toastEl.setAttribute('aria-atomic', 'true');
+                    toastEl.innerHTML = `
+                        <div class="d-flex">
+                            <div class="toast-body">${message}</div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    `;
+                    
+                    // Get toast container or create one
+                    let toastContainer = document.querySelector('.toast-container');
+                    if (!toastContainer) {
+                        toastContainer = document.createElement('div');
+                        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                        toastContainer.style.zIndex = '9999';
+                        document.body.appendChild(toastContainer);
+                    }
+                    
+                    toastContainer.appendChild(toastEl);
+                    const bsToast = new bootstrap.Toast(toastEl);
+                    bsToast.show();
+                    
+                    toastEl.addEventListener('hidden.bs.toast', function() {
+                        toastEl.remove();
+                    });
+                }
             }
 
-            // Show Toast Notification
-            function showToast(message, type = 'error') {
-                // Create toast element
-                const toast = document.createElement('div');
-                toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : 'success'} border-0`;
-                toast.setAttribute('role', 'alert');
-                toast.setAttribute('aria-live', 'assertive');
-                toast.setAttribute('aria-atomic', 'true');
-                toast.innerHTML = `
-                    <div class="d-flex">
-                        <div class="toast-body">${message}</div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                `;
+            // Check Rate Limit Function
+            function checkRateLimit() {
+                // Check if there's a rate limit error in session
+                @if(session('error') && str_contains(session('error'), 'Too many login attempts'))
+                    const errorMsg = '{{ session('error') }}';
+                    // Extract minutes from error message (e.g., "1 minute" or "2 minutes")
+                    const minuteMatch = errorMsg.match(/(\d+)\s+minute/);
+                    
+                    if (minuteMatch) {
+                        const minutes = parseInt(minuteMatch[1]);
+                        // Always use 60 seconds (1 minute) for rate limit
+                        startRateLimitTimer(60);
+                    } else {
+                        // Default to 60 seconds
+                        startRateLimitTimer(60);
+                    }
+                @endif
+            }
+
+            // Start Rate Limit Timer
+            function startRateLimitTimer(seconds) {
+                loginBtn.disabled = true;
+                rateLimitTimer.style.display = 'flex';
                 
-                // Get toast container or create one
-                let toastContainer = document.querySelector('.toast-container');
-                if (!toastContainer) {
-                    toastContainer = document.createElement('div');
-                    toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-                    toastContainer.style.zIndex = '9999';
-                    document.body.appendChild(toastContainer);
-                }
+                let remainingSeconds = seconds;
                 
-                toastContainer.appendChild(toast);
-                const bsToast = new bootstrap.Toast(toast);
-                bsToast.show();
-                
-                // Remove toast element after it's hidden
-                toast.addEventListener('hidden.bs.toast', function() {
-                    toast.remove();
-                });
+                const timerInterval = setInterval(function() {
+                    remainingSeconds--;
+                    const mins = Math.floor(remainingSeconds / 60);
+                    const secs = remainingSeconds % 60;
+                    
+                    if (remainingSeconds > 0) {
+                        if (mins > 0) {
+                            timerText.innerHTML = `Please wait <span id="timerSeconds">${mins} minute${mins > 1 ? 's' : ''} ${secs} second${secs !== 1 ? 's' : ''}</span> before trying again.`;
+                        } else {
+                            timerText.innerHTML = `Please wait <span id="timerSeconds">${secs} second${secs !== 1 ? 's' : ''}</span> before trying again.`;
+                        }
+                    } else {
+                        clearInterval(timerInterval);
+                        loginBtn.disabled = false;
+                        rateLimitTimer.style.display = 'none';
+                        timerText.innerHTML = 'Please wait <span id="timerSeconds">60</span> seconds before trying again.';
+                    }
+                }, 1000);
             }
 
             // Form Submission Validation
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
+                
+                // Check if button is disabled (rate limited)
+                if (loginBtn.disabled) {
+                    return;
+                }
+                
                 let isValid = true;
                 let errorMessages = [];
                 
@@ -692,7 +784,7 @@
                     emailError.textContent = '';
                 }
                 
-                // Password validation
+                // Password validation (simple - just check if not empty)
                 const password = passwordInput.value;
                 if (password === '') {
                     passwordInput.classList.add('is-invalid');
@@ -700,37 +792,28 @@
                     errorMessages.push('Password is required');
                     isValid = false;
                 } else {
-                    const requirements = checkPasswordRequirements(password);
-                    const missingRequirements = [];
-                    
-                    if (!requirements.length) missingRequirements.push('at least 8 characters');
-                    if (!requirements.uppercase) missingRequirements.push('one uppercase letter');
-                    if (!requirements.lowercase) missingRequirements.push('one lowercase letter');
-                    if (!requirements.number) missingRequirements.push('one number');
-                    if (!requirements.special) missingRequirements.push('one special character');
-                    
-                    if (missingRequirements.length > 0) {
-                        passwordInput.classList.add('is-invalid');
-                        passwordError.textContent = 'Password must contain: ' + missingRequirements.join(', ');
-                        errorMessages.push('Password must contain: ' + missingRequirements.join(', '));
-                        isValid = false;
-                    } else {
-                        passwordInput.classList.remove('is-invalid');
-                        passwordInput.classList.add('is-valid');
-                        passwordError.textContent = '';
-                    }
+                    passwordInput.classList.remove('is-invalid');
+                    passwordInput.classList.add('is-valid');
+                    passwordError.textContent = '';
                 }
                 
                 if (!isValid) {
-                    // Show toast with error messages
+                    // Show toast with error messages using global toast
                     const errorMessage = errorMessages.join('. ');
-                    showToast(errorMessage, 'error');
+                    if (typeof window.toast === 'function') {
+                        window.toast('error', errorMessage);
+                    } else if (typeof toast === 'function') {
+                        toast('error', errorMessage);
+                    } else {
+                        showToast(errorMessage, 'error');
+                    }
                 } else {
                     // Show loading state
                     loginBtn.disabled = true;
                     loginBtn.classList.add('loading');
                     
-                    // Submit form if valid
+                    // Submit form normally - rate limiting handled server-side
+                    // If rate limited, page will reload with error and timer will start
                     form.submit();
                 }
             });
@@ -740,42 +823,30 @@
     <!-- Global Toast System -->
     @include('common.toast')
     
+    <!-- Load main.js for global toast function -->
+    <script src="{{ asset('frontend/main.js') }}"></script>
+    
     <!-- Show Server-Side Toast Messages -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if toast function exists (from main.js)
-            if (typeof toast === 'function') {
+            // Use global toast function
+            const showToastMessage = (typeof window.toast === 'function') ? window.toast : (typeof toast === 'function' ? toast : null);
+            
+            if (showToastMessage) {
                 @if(session('success'))
-                    toast('success', '{{ session('success') }}');
+                    showToastMessage('success', '{{ session('success') }}');
                 @endif
 
                 @if(session('error'))
-                    toast('error', '{{ session('error') }}');
+                    showToastMessage('error', '{{ session('error') }}');
                 @endif
 
                 @if(session('warning'))
-                    toast('warning', '{{ session('warning') }}');
+                    showToastMessage('warning', '{{ session('warning') }}');
                 @endif
 
                 @if(session('info'))
-                    toast('info', '{{ session('info') }}');
-                @endif
-            } else {
-                // Fallback: Use Bootstrap Toast if toast function doesn't exist
-                @if(session('success'))
-                    showToast('{{ session('success') }}', 'success');
-                @endif
-
-                @if(session('error'))
-                    showToast('{{ session('error') }}', 'error');
-                @endif
-
-                @if(session('warning'))
-                    showToast('{{ session('warning') }}', 'warning');
-                @endif
-
-                @if(session('info'))
-                    showToast('{{ session('info') }}', 'info');
+                    showToastMessage('info', '{{ session('info') }}');
                 @endif
             }
         });

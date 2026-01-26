@@ -30,6 +30,7 @@
                     </div>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end admin-profile-menu" aria-labelledby="adminProfileDropdown">
+                    @if(session('admin_role', 'admin') === 'admin')
                     <li>
                         <a class="dropdown-item admin-profile-menu-item" href="{{ route('admin.profile') }}">
                             <i class="fas fa-user me-2"></i>
@@ -37,6 +38,7 @@
                         </a>
                     </li>
                     <li><hr class="dropdown-divider"></li>
+                    @endif
                     <li>
                         <form action="{{ route('admin.logout') }}" method="POST" class="d-inline">
                             @csrf

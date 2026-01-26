@@ -17,6 +17,30 @@
     
     <!-- Frontend Custom CSS -->
     <link href="{{ asset('frontend/style.css') }}" rel="stylesheet">
+
+    <!-- Admin mobile button spacing (global) -->
+    <style>
+        @media (max-width: 576px) {
+            /* Make admin buttons readable on phone */
+            .admin-main-content button,
+            .admin-main-content .btn,
+            .admin-main-content a.btn,
+            .admin-main-content .admin-profile-btn,
+            .admin-main-content .admin-dashboard-view-all-btn {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+                gap: 0.5rem !important;
+                white-space: normal;
+                line-height: 1.2;
+            }
+            .admin-main-content .admin-profile-btn .btn-text,
+            .admin-main-content .admin-profile-btn .btn-loader {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+        }
+    </style>
     
     <!-- Page Specific Styles -->
     @stack('styles')

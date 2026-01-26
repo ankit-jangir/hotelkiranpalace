@@ -123,4 +123,13 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Developer Secret Key
+    |--------------------------------------------------------------------------
+    | Used for developer/company-only routes (e.g. create admin). Pass as
+    | ?key=YOUR_SECRET or X-Developer-Key header. Set DEVELOPER_SECRET_KEY in .env
+    */
+    'developer_secret_key' => env('DEVELOPER_SECRET_KEY'),
+
 ];

@@ -243,42 +243,52 @@ if (subscribeForm && subscribeBtn) {
         e.preventDefault();
 
         const emailInput = this.querySelector(".subscribe-input");
-        const email = emailInput ? emailInput.value.trim() : "";
+        const email = emailInput.value.trim();
 
-        // Basic email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const btnText = subscribeBtn.querySelector(".subscribe-btn-text");
+        const btnLoader = subscribeBtn.querySelector(".subscribe-btn-loader");
 
         if (!email) {
             toast("error", "Please enter your email address");
             return;
         }
 
-        if (!emailRegex.test(email)) {
-            toast("error", "Please enter a valid email address");
-            return;
-        }
-
-        // Show loader
-        subscribeBtn.classList.add("loading");
+        // 🔄 SHOW LOADER
         subscribeBtn.disabled = true;
+        btnText.classList.add("d-none");
+        btnLoader.classList.remove("d-none");
 
-        // Simulate subscription (you can replace this with actual API call)
-        // For now, show success toast
-        setTimeout(function () {
-            toast(
-                "success",
-                "Thank you! You have been successfully subscribed to our newsletter.",
-            );
-            emailInput.value = "";
-
-            // Hide loader after toast appears
-            setTimeout(function () {
-                subscribeBtn.classList.remove("loading");
+        fetch(this.action, {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": document.querySelector(
+                    'input[name="_token"]'
+                ).value,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.success) {
+                    toast("success", data.message);
+                    emailInput.value = "";
+                } else {
+                    toast("error", data.message);
+                }
+            })
+            .catch(() => {
+                toast("error", "Server error. Please try again.");
+            })
+            .finally(() => {
+                // ✅ HIDE LOADER AFTER RESPONSE
                 subscribeBtn.disabled = false;
-            }, 100);
-        }, 500);
+                btnText.classList.remove("d-none");
+                btnLoader.classList.add("d-none");
+            });
     });
 }
+
 
 // ========================================
 // Hero Section - Video Auto-play and Loop
@@ -751,26 +761,26 @@ document
 // - admin-hero.js for hero section functionality
 // - admin-gallery.js for gallery functionality
 
-            theme: 'snow',
-            modules: {
-                toolbar: [
-                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                    [{ 'font': [] }],
-                    [{ 'size': [] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    [{ 'color': [] }, { 'background': [] }],
-                    [{ 'script': 'sub'}, { 'script': 'super' }],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    [{ 'indent': '-1'}, { 'indent': '+1' }],
-                    [{ 'direction': 'rtl' }],
-                    [{ 'align': [] }],
-                    ['link', 'image', 'video'],
-                    ['clean']
-                ]
-            }
-        });
-    }
-});
+//             theme: 'snow',
+//             modules: {
+//                 toolbar: [
+//                     [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+//                     [{ 'font': [] }],
+//                     [{ 'size': [] }],
+//                     ['bold', 'italic', 'underline', 'strike'],
+//                     [{ 'color': [] }, { 'background': [] }],
+//                     [{ 'script': 'sub'}, { 'script': 'super' }],
+//                     [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+//                     [{ 'indent': '-1'}, { 'indent': '+1' }],
+//                     [{ 'direction': 'rtl' }],
+//                     [{ 'align': [] }],
+//                     ['link', 'image', 'video'],
+//                     ['clean']
+//                 ]
+//             }
+//         });
+//     }
+// });
 
 // Gallery Functions
 // Gallery-related JavaScript has been moved to admin-gallery.js
