@@ -63,11 +63,7 @@ $rooms = [
         </div>
     </div>
 
-
     @endforeach
-
-
-
 
 </div>
 <!-- MAIN FACILITIES -->
@@ -113,5 +109,7 @@ $rooms = [
         </div>
     </div>
 </section>
+
+@include('common.testimonials-preview')
 
 @endsection

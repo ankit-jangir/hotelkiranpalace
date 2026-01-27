@@ -4,70 +4,99 @@
 
 @section('content')
 
-<div class="container my-5">
-    <div class="row">
+<div class=" blog-body">
 
-        <!-- LEFT : BLOG LIST -->
-        <div class="col-lg-9 col-md-8 order-2 order-md-1">
+    <div class="container my-5">
 
-            <div class="row g-4" id="blogContainer">
-                @for($i=1;$i<=9;$i++) <div class="col-lg-4 col-md-6 blog-item luxury">
-                    <div class="blog-card">
-                        <img src="{{ asset('images/hero_section_img3.jpg') }}" alt="">
-                        <div class="blog-overlay">
-                            <span>Luxury</span>
-                            <h4>Royal Luxury Room</h4>
-                            <p>Experience premium comfort & elegance.</p>
-                            <a href="#">Read More →</a>
+        <div class="row">
+
+            <!-- LEFT : BLOG LIST -->
+            <div class="col-lg-9 col-md-8 order-2 order-md-1">
+                <div class="row g-4" id="blogContainer">
+
+                    @php
+                    $blogs = [
+                    ['title'=>'Educating the Future Generation','desc'=>'Providing quality education to underprivileged
+                    children.','category'=>'Education','img'=>'images/hero_section_img3.jpg'],
+                    ['title'=>'Free Health Camps','desc'=>'Medical support reaching rural
+                    communities.','category'=>'Healthcare','img'=>'images/hero_section_img3.jpg'],
+                    ['title'=>'Women Skill Development','desc'=>'Empowering women through skills &
+                    awareness.','category'=>'Women Empowerment','img'=>'images/hero_section_img3.jpg'],
+                    ['title'=>'Green Initiatives','desc'=>'Promoting environment &
+                    sustainability.','category'=>'Environment','img'=>'images/hero_section_img3.jpg'],
+                    ];
+                    @endphp
+
+                    @foreach($blogs as $blog)
+                    <div class="col-lg-4 col-md-6 blog-item {{ strtolower(str_replace(' ','-',$blog['category'])) }}">
+                        <div class="blog-card shadow-sm rounded">
+                            <div class="blog-img-wrapper position-relative">
+                                <img src="{{ asset($blog['img']) }}" alt="{{ $blog['title'] }}"
+                                    class="img-fluid rounded-top">
+                                <span class="blog-label position-absolute">{{ $blog['category'] }}</span>
+                            </div>
+                            <div class="blog-content p-3">
+                                <h5 class="mb-2">{{ $blog['title'] }}</h5>
+                                <p class="mb-3 text-muted">{{ $blog['desc'] }}</p>
+                                <a href="#" class="read-more">Read More →</a>
+                            </div>
                         </div>
                     </div>
+                    @endforeach
+
+                </div>
+
+                <!-- PAGINATION -->
+                <div class="pagination-wrapper mt-5 d-flex justify-content-center align-items-center gap-3">
+                    <button onclick="prevPage()" class="btn btn-outline-orange">←</button>
+                    <span id="pageNumber" class="fw-bold">1</span>
+                    <button onclick="nextPage()" class="btn btn-outline-orange">→</button>
+                </div>
             </div>
-            @endfor
-        </div>
 
-        <!-- PAGINATION -->
-        <div class="pagination-wrapper mt-5">
-            <button onclick="prevPage()">←</button>
-            <span id="pageNumber">1</span>
-            <button onclick="nextPage()">→</button>
-        </div>
+            <!-- RIGHT : FILTER SIDEBAR -->
+            <div class="col-lg-3 col-md-4 order-1 order-md-2 mb-4 mb-md-0">
+                <div class="blog-filter-sidebar p-3 shadow-sm rounded bg-white">
+                    <h5 class="mb-3 text-orange">Filter by Cause</h5>
+                    <button class="filter-btn active w-100 mb-2 text-start" onclick="filterBlog('all')">All</button>
+                    <button class="filter-btn w-100 mb-2 text-start"
+                        onclick="filterBlog('education')">Education</button>
+                    <button class="filter-btn w-100 mb-2 text-start"
+                        onclick="filterBlog('healthcare')">Healthcare</button>
+                    <button class="filter-btn w-100 mb-2 text-start" onclick="filterBlog('women-empowerment')">Women
+                        Empowerment</button>
+                    <button class="filter-btn w-100 mb-2 text-start"
+                        onclick="filterBlog('environment')">Environment</button>
+                </div>
+            </div>
 
-    </div>
-
-    <!-- RIGHT : FILTER SIDEBAR -->
-    <div class="col-lg-3 col-md-4 order-1 order-md-2 mb-4 mb-md-0">
-        <div class="blog-filter-sidebar">
-            <h5>Categories</h5>
-            <button class="active" onclick="filterBlog('all')">All</button>
-            <button onclick="filterBlog('luxury')">Luxury</button>
-            <button onclick="filterBlog('travel')">Travel</button>
-            <button onclick="filterBlog('food')">Dining</button>
-            <button onclick="filterBlog('events')">Events</button>
         </div>
     </div>
 
-</div>
-</div>
-
-<!-- RELATED BLOGS -->
-<section class="related-section py-5">
-    <div class="container">
-        <h2 class="text-center mb-5">Related Blogs</h2>
-
-        <div class="row g-4">
-            @for($i=1;$i<=3;$i++) <div class="col-md-4">
-                <div class="related-card">
-                    <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb">
-                    <div class="related-card-overlay">
-                        <h5>Luxury Stay Experience</h5>
-                        <p>Finest luxury with exceptional services.</p>
-                        <a href="#">Read More</a>
+    <!-- RELATED BLOGS -->
+    <section class="related-section py-5 ">
+        <div class="container">
+            <h2 class="text-center mb-5 text-orange">Related Blogs</h2>
+            <div class="row g-4">
+                @foreach($blogs as $blog)
+                <div class="col-md-4">
+                    <div class="blog-card shadow-sm rounded">
+                        <div class="blog-img-wrapper position-relative">
+                            <img src="{{ asset($blog['img']) }}" alt="{{ $blog['title'] }}"
+                                class="img-fluid rounded-top">
+                            <span class="blog-label position-absolute">{{ $blog['category'] }}</span>
+                        </div>
+                        <div class="blog-content p-3">
+                            <h5 class="mb-2">{{ $blog['title'] }}</h5>
+                            <p class="mb-3 text-muted">{{ $blog['desc'] }}</p>
+                            <a href="#" class="read-more">Read More →</a>
+                        </div>
                     </div>
                 </div>
+                @endforeach
+            </div>
         </div>
-        @endfor
-    </div>
-    </div>
-</section>
+    </section>
+</div>
 
 @endsection
