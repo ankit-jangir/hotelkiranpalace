@@ -694,42 +694,53 @@ let galleryCarousel;
 let autoThumbInterval;
 
 function openGalleryModal(data) {
-document.getElementById("galleryTitle").innerText = data.title;
-document.getElementById("galleryDesc").innerText = data.desc;
 
-let sliderHtml = "";
-let thumbHtml = "";
+    // 🔥 RESET OLD STUFF
+    if (typeof autoThumbInterval !== "undefined") {
+        clearInterval(autoThumbInterval);
+    }
 
-data.images.forEach((img, i) => {
-    sliderHtml += `
-    <div class="carousel-item ${i === 0 ? "active" : ""}">
-        <img src="${img}" class="d-block w-100 gallery-big-img">
-    </div>`;
+    if (typeof galleryCarousel !== "undefined") {
+        galleryCarousel.dispose();
+    }
 
-    thumbHtml += `
-    <img src="${img}" class="thumb-img ${i === 0 ? "active" : ""}"
-         onclick="goToSlide(${i})">`;
-});
+    document.getElementById("galleryTitle").innerText = data.title;
+    document.getElementById("galleryDesc").innerText = data.desc;
 
-document.getElementById("galleryImages").innerHTML = sliderHtml;
-document.getElementById("thumbContainer").innerHTML = thumbHtml;
+    let sliderHtml = "";
+    let thumbHtml = "";
 
-const modal = new bootstrap.Modal(
-    document.getElementById("galleryDetailModal"),
-);
-modal.show();
+    data.images.forEach((img, i) => {
+        sliderHtml += `
+            <div class="carousel-item ${i === 0 ? "active" : ""}">
+                <img src="${img}" class="d-block w-100 gallery-big-img">
+            </div>`;
 
-galleryCarousel = new bootstrap.Carousel(
-    document.getElementById("galleryCarousel"),
-    { interval: 3500 },
-);
+        thumbHtml += `
+            <img src="${img}" 
+                 class="thumb-img ${i === 0 ? "active" : ""}"
+                 onclick="goToSlide(${i})">`;
+    });
 
-autoThumbInterval = setInterval(() => {
-    document
-        .getElementById("thumbContainer")
-        .scrollBy({ left: 120, behavior: "smooth" });
-}, 3000);
+    document.getElementById("galleryImages").innerHTML = sliderHtml;
+    document.getElementById("thumbContainer").innerHTML = thumbHtml;
+
+    const modalEl = document.getElementById("galleryDetailModal");
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+
+    galleryCarousel = new bootstrap.Carousel(
+        document.getElementById("galleryCarousel"),
+        { interval: 3500 }
+    );
+
+    autoThumbInterval = setInterval(() => {
+        document
+            .getElementById("thumbContainer")
+            .scrollBy({ left: 120, behavior: "smooth" });
+    }, 3000);
 }
+
 
 /* Thumbnail click */
 function goToSlide(index) {

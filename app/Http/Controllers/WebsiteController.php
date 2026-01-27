@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Models\Gallery;
 class WebsiteController extends Controller
 {
     public function home()
@@ -26,10 +26,20 @@ class WebsiteController extends Controller
         return view('website.amenities');
     }
 
-    public function gallery()
-    {
-        return view('website.gallery');
-    }
+public function gallery()
+{
+    $galleries = Gallery::orderBy('created_at', 'desc')->get();
+
+    $imageGalleries = $galleries->where('type', 'image');
+    $videoGalleries = $galleries->where('type', 'video');
+
+    return view('website.gallery', compact(
+        'galleries',
+        'imageGalleries',
+        'videoGalleries'
+    ));
+}
+
 
     public function contact()
     {

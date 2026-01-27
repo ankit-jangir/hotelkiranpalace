@@ -3,7 +3,38 @@
 @section('title', 'Privacy Policy | Hotel Kiran Place')
 
 @section('content')
+<style>
+    .policy-contact-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
 
+.policy-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+}
+
+.policy-contact-item i {
+    color: #ff7a00; /* theme orange */
+    font-size: 18px;
+}
+
+.policy-contact-item a {
+    color: #ff7a00;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.policy-contact-item a:hover {
+    text-decoration: underline;
+    color: #e66f00;
+}
+
+</style>
 
 <!-- CONTENT -->
 <section class="privacy-content py-5">
@@ -87,7 +118,26 @@
                 If you have any questions regarding this Privacy Policy, please contact us:
             </p>
             <p>
-                📧 <a href="mailto:info@hotelkiranplace.com">info@hotelkiranplace.com</a>
+                <div class="policy-contact-box mt-3">
+    @if (!empty($adminSetting->admin_email_1))
+        <div class="policy-contact-item">
+            <i class="fas fa-envelope"></i>
+            <a href="mailto:{{ $adminSetting->admin_email_1 }}">
+                {{ $adminSetting->admin_email_1 }}
+            </a>
+        </div>
+    @endif
+
+    @if (!empty($adminSetting->admin_email_2))
+        <div class="policy-contact-item">
+            <i class="fas fa-envelope"></i>
+            <a href="mailto:{{ $adminSetting->admin_email_2 }}">
+                {{ $adminSetting->admin_email_2 }}
+            </a>
+        </div>
+    @endif
+</div>
+
             </p>
 
             <p class="last-updated">

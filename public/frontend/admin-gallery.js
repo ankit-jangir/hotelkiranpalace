@@ -25,15 +25,25 @@ function toggleGalleryFormType(type) {
 function toggleUploadType(type) {
     const singleSection = document.getElementById('singleImageSection');
     const multipleSection = document.getElementById('multipleImagesSection');
-    
+
+    const singleInput = singleSection.querySelector('input[type="file"]');
+    const multipleInputs = multipleSection.querySelectorAll('input[type="file"]');
+
     if (type === 'single') {
+        // Show single, hide multiple
         singleSection.style.display = 'block';
         multipleSection.style.display = 'none';
-        // Clear multiple images container
+
+        // Enable / Disable inputs
+        singleInput.disabled = false;
+        multipleInputs.forEach(input => input.disabled = true);
+
+        // Clear multiple images container (reset to 1 input)
         const container = document.getElementById('multipleImagesContainer');
         container.innerHTML = `
             <div class="admin-gallery-image-input-wrapper">
-                <input type="file" class="admin-gallery-form-input" name="images[]" accept="image/*" onchange="previewMultipleImage(this, this.parentElement)">
+                <input type="file" class="admin-gallery-form-input" name="images[]" accept="image/*"
+                       onchange="previewMultipleImage(this, this.parentElement)" disabled>
                 <button type="button" class="admin-gallery-remove-image-btn" onclick="removeImageInput(this)" style="display: none;">
                     <i class="fas fa-times"></i>
                 </button>
@@ -41,9 +51,16 @@ function toggleUploadType(type) {
             </div>
         `;
     } else {
+        // Show multiple, hide single
         singleSection.style.display = 'none';
         multipleSection.style.display = 'block';
-        // Clear single image preview
+
+        // Enable / Disable inputs
+        singleInput.disabled = true;
+        multipleInputs.forEach(input => input.disabled = false);
+
+        // Clear single preview & input
+        singleInput.value = '';
         document.getElementById('singleImagePreview').innerHTML = '';
     }
 }

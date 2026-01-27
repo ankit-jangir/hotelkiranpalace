@@ -12,12 +12,11 @@ Route::get('/room/{slug}', [WebsiteController::class, 'roomDetail'])->name('room
 Route::get('/amenities', [WebsiteController::class, 'amenities'])->name('amenities');
 Route::get('/gallery', [WebsiteController::class, 'gallery'])->name('gallery');
 Route::get('/contact', [WebsiteController::class, 'contact'])->name('contact');
-Route::post('/contact', [AdminController::class, 'contactSubmit'])->name('contact.submit');
+Route::post('/contact', [WebsiteController::class, 'contactSubmit'])->name('contact.submit');
 Route::get('/terms', [WebsiteController::class, 'terms'])->name('terms');
 Route::get('/privacy', [WebsiteController::class, 'privacy'])->name('privacy');
 Route::get('/faq', [WebsiteController::class, 'faq'])->name('faq');
 Route::get('/blog', [WebsiteController::class, 'blog'])->name('blog');
-Route::get('/blogdetail', [WebsiteController::class, 'blogdetail'])->name('website.blogdetail');
 Route::get('/booking-policy', [WebsiteController::class, 'bookingPolicy'])->name('booking.policy');
 Route::get('/cancellation-policy', [WebsiteController::class, 'cancellationPolicy'])->name('cancellation.policy');
 
@@ -61,9 +60,9 @@ Route::prefix('admin')->middleware('admin.session')->group(function () {
     Route::get('/contacts/{id}', [AdminController::class, 'contactShow'])->name('admin.contacts.show');
     Route::delete('/contacts/{id}', [AdminController::class, 'contactDelete'])->name('admin.contacts.delete');
     Route::get('/user-subscribe-details', [AdminController::class, 'userSubscribeDetails'])->name('admin.user-subscribe-details');
-    Route::post('/subscribe', [AdminController::class, 'subscribeStore'])
-    ->name('subscribe.store');
     Route::post('/subscriptions/bulk-delete', [AdminController::class, 'bulkDeleteSubscriptions'])->name('admin.subscriptions.bulk-delete');
+    Route::post('/subscribe', [AdminController::class, 'store'])
+    ->name('subscribe.store');
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
     Route::post('/settings', [AdminController::class, 'settingsStore'])->name('admin.settings.store');
     Route::put('/settings/{id}', [AdminController::class, 'settingsUpdate'])->name('admin.settings.update');

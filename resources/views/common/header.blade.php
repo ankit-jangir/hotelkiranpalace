@@ -77,7 +77,7 @@
                         <span class="nav-dot position-absolute" style="left: -12px; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; background: #ff6b35; border-radius: 50%; opacity: 0; transition: opacity 0.3s;"></span>
                     </a>
                     <ul class="dropdown-menu border-0 shadow-sm rounded-3" aria-labelledby="moreDropdown" style="margin-top: 0.75rem; min-width: 220px; padding: 0.5rem 0;">
-                        <li><a class="dropdown-item py-2 px-3" href="#" style="font-size: 0.9rem; color: #333; transition: all 0.2s;">Club</a></li>
+                        {{-- <li><a class="dropdown-item py-2 px-3" href="#" style="font-size: 0.9rem; color: #333; transition: all 0.2s;">Club</a></li> --}}
                         <li><a class="dropdown-item py-2 px-3" href="{{ route('terms') }}" style="font-size: 0.9rem; color: #333; transition: all 0.2s;">Terms & Conditions</a></li>
                         <li><a class="dropdown-item py-2 px-3" href="{{ route('privacy') }}" style="font-size: 0.9rem; color: #333; transition: all 0.2s;">Privacy Policy</a></li>
                         <li><a class="dropdown-item py-2 px-3" href="{{ route('faq') }}" style="font-size: 0.9rem; color: #333; transition: all 0.2s;">FAQ</a></li>
@@ -185,7 +185,7 @@
                 </a>
                 <div class="collapse {{ request()->routeIs('terms', 'privacy', 'faq') ? 'show' : '' }}" id="mobileMoreCollapse">
                     <ul class="list-unstyled bg-light mb-0">
-                        <li><a class="d-block py-2 px-5 text-decoration-none" href="#" style="color: #666; font-size: 0.9rem;" >Club</a></li>
+                        {{-- <li><a class="d-block py-2 px-5 text-decoration-none" href="#" style="color: #666; font-size: 0.9rem;" >Club</a></li> --}}
                         <li><a class="d-block py-2 px-5 text-decoration-none {{ request()->routeIs('terms') ? 'fw-bold' : '' }}" href="{{ route('terms') }}" style="color: {{ request()->routeIs('terms') ? '#ff6b35' : '#666' }}; font-size: 0.9rem;" >Terms & Conditions</a></li>
                         <li><a class="d-block py-2 px-5 text-decoration-none {{ request()->routeIs('privacy') ? 'fw-bold' : '' }}" href="{{ route('privacy') }}" style="color: {{ request()->routeIs('privacy') ? '#ff6b35' : '#666' }}; font-size: 0.9rem;" >Privacy Policy</a></li>
                         <li><a class="d-block py-2 px-5 text-decoration-none {{ request()->routeIs('faq') ? 'fw-bold' : '' }}" href="{{ route('faq') }}" style="color: {{ request()->routeIs('faq') ? '#ff6b35' : '#666' }}; font-size: 0.9rem;" >FAQ</a></li>

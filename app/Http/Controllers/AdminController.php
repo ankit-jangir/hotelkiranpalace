@@ -18,7 +18,6 @@ use App\Models\Contact;
 use App\Models\AdminSetting;
 use App\Models\StaffUser;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 class AdminController extends Controller
 {
     public function showLogin()
@@ -502,36 +501,46 @@ public function store(Request $request)
     try {
         $type = $request->input('type', 'image');
         
-        if ($type === 'image') {
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'heading' => 'nullable|string|max:255',
-                'description' => 'nullable|string',
-                'main_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'images' => 'nullable|array',
-                'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            ]);
-            
-            // Store main image
-            $mainImagePath = $request->file('main_image')->store('gallery', 'public');
-            
-            // Store sub images
-            $subImages = [];
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $subImages[] = 'storage/' . $image->store('gallery/sub', 'public');
-                }
+       if ($type === 'image') {
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'heading' => 'nullable|string|max:255',
+        'description' => 'nullable|string',
+        'main_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'images' => 'nullable|array',
+        'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
+
+    $mainImagePath = $request->file('main_image')->store('gallery', 'public');
+
+    // 👇 duplicate-safe logic here
+    $subImages = [];
+    $imageHashes = [];
+
+    if ($request->hasFile('images')) {
+        foreach ($request->file('images') as $image) {
+            $hash = md5_file($image->getRealPath());
+
+            if (in_array($hash, $imageHashes)) {
+                continue;
             }
-            
-            Gallery::create([
-                'name' => $request->name,
-                'heading' => $request->heading,
-                'description' => $request->description,
-                'main_image' => 'storage/' . $mainImagePath,
-                'sub_images' => $subImages,
-                'type' => 'image',
-            ]);
-        } else if ($type === 'video') {
+
+            $path = $image->store('gallery/sub', 'public');
+            $subImages[] = $path;
+            $imageHashes[] = $hash;
+        }
+    }
+
+    Gallery::create([
+        'name' => $request->name,
+        'heading' => $request->heading,
+        'description' => $request->description,
+        'main_image' => $mainImagePath,
+        'sub_images' => $subImages,
+        'type' => 'image',
+    ]);
+}
+ else if ($type === 'video') {
             $request->validate([
                 'name' => 'required|string|max:255',
                 'heading' => 'nullable|string|max:255',
@@ -546,7 +555,7 @@ public function store(Request $request)
                 'name' => $request->name,
                 'heading' => $request->heading,
                 'description' => $request->description,
-                'main_image' => 'storage/' . $mainVideoPath, // Store video path in main_image for compatibility
+                'main_image' =>  $mainVideoPath, // Store video path in main_image for compatibility
                 'type' => 'video',
             ]);
         } else {
@@ -573,7 +582,19 @@ public function galleryShow($id)
 
     try {
         $gallery = Gallery::findOrFail($id);
-        
+         // ✅ helper function (local)
+        $makeUrl = function ($path) {
+            if (!$path) return null;
+
+            // agar already full URL hai
+            if (str_starts_with($path, 'http')) {
+                return $path;
+            }
+
+            // storage path ko public URL banao
+            return asset('storage/' . ltrim($path, '/'));
+        };
+
         // Process sub_images to extract paths
         $subImages = [];
         if ($gallery->sub_images && is_array($gallery->sub_images)) {
@@ -686,31 +707,34 @@ public function galleryDelete($id)
             ];
 
             // Handle main image - save to public/img/rooms
-            if ($request->hasFile('main_image')) {
-                $file = $request->file('main_image');
-                $filename = time() . '_main.' . $file->getClientOriginalExtension();
-                $imgPath = public_path('img/rooms');
-                if (!file_exists($imgPath)) {
-                    mkdir($imgPath, 0755, true);
-                }
-                $file->move($imgPath, $filename);
-                $data['main_image'] = 'img/rooms/' . $filename;
-            }
+            // if ($request->hasFile('main_image')) {
+            //     $file = $request->file('main_image');
+            //     $filename = time() . '_main.' . $file->getClientOriginalExtension();
+            //     $imgPath = public_path('img/rooms');
+            //     if (!file_exists($imgPath)) {
+            //         mkdir($imgPath, 0755, true);
+            //     }
+            //     $file->move($imgPath, $filename);
+            //     $data['main_image'] = 'img/rooms/' . $filename;
+            // }
+if ($request->hasFile('main_image')) {
+    // auto creates: storage/app/public/rooms
+    $path = $request->file('main_image')->store('rooms', 'public');
 
+    // DB me sirf relative path
+    $data['main_image'] = $path; // rooms/xxxx.jpg
+}
             // Handle sub images - save to public/img/rooms
-            $subImages = [];
-            if ($request->hasFile('sub_images')) {
-                $imgPath = public_path('img/rooms');
-                if (!file_exists($imgPath)) {
-                    mkdir($imgPath, 0755, true);
-                }
-                foreach ($request->file('sub_images') as $file) {
-                    $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                    $file->move($imgPath, $filename);
-                    $subImages[] = 'img/rooms/' . $filename;
-                }
-            }
-            $data['sub_images'] = $subImages;
+           $subImages = [];
+
+if ($request->hasFile('sub_images')) {
+    foreach ($request->file('sub_images') as $file) {
+        $subImages[] = $file->store('rooms/sub', 'public');
+    }
+}
+
+$data['sub_images'] = $subImages;
+
 
             Room::create($data);
 
@@ -969,7 +993,7 @@ public function galleryDelete($id)
                         $path = $file->storeAs('hero_sections', $filename, 'public');
                         
                         $images[] = [
-                            'image' => 'storage/' . $path,
+                            'image' => $path,
                             'title' => $request->input("image_title_$i", ''),
                             'description' => $request->input("image_description_$i", '')
                         ];
@@ -981,7 +1005,7 @@ public function galleryDelete($id)
                     $file = $request->file('video');
                     $filename = time() . '_video.' . $file->getClientOriginalExtension();
                     $path = $file->storeAs('hero_sections', $filename, 'public');
-                    $data['video'] = 'storage/' . $path;
+                    $data['video'] =  $path;
                 }
                 $data['video_title'] = $request->video_title;
                 $data['video_description'] = $request->video_description;
@@ -1033,7 +1057,7 @@ public function galleryDelete($id)
                         $path = $file->storeAs('hero_sections', $filename, 'public');
                         
                         $images[] = [
-                            'image' => 'storage/' . $path,
+                            'image' => $path,
                             'title' => $request->input("image_title_$i", ''),
                             'description' => $request->input("image_description_$i", '')
                         ];
@@ -1051,7 +1075,7 @@ public function galleryDelete($id)
                     $file = $request->file('video');
                     $filename = time() . '_video.' . $file->getClientOriginalExtension();
                     $path = $file->storeAs('hero_sections', $filename, 'public');
-                    $data['video'] = 'storage/' . $path;
+                    $data['video'] =  $path;
                 } elseif ($request->has('existing_video')) {
                     $data['video'] = $request->existing_video;
                 }
@@ -1147,60 +1171,6 @@ public function galleryDelete($id)
         }
     }
 
-        // Handle form submission
-public function contactSubmit(Request $request)
-{
-    try {
-        // Validate input
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'country_code' => 'required|string|max:5',
-            'phone' => 'required|string|max:12',
-            'room_type' => 'required|string',
-            'checkin_date' => 'required|date',
-            'checkout_date' => 'nullable|date|after_or_equal:checkin_date',
-            'comments' => 'nullable|string|max:2000',
-            'privacy_agreement' => 'accepted',
-        ]);
-
-        // Check for duplicate email
-        $existing = Contact::where('email', $validated['email'])->first();
-        if ($existing) {
-            return redirect()->back()->with('error', 'You have already submitted a request with this email.');
-        }
-
-        // Save to DB inside transaction
-        DB::beginTransaction();
-
-        Contact::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'country_code' => $validated['country_code'],
-            'phone' => $validated['phone'],
-            'room_type' => $validated['room_type'],
-            'checkin_date' => $validated['checkin_date'],
-            'checkout_date' => $validated['checkout_date'] ?? null,
-            'comments' => $validated['comments'] ?? null,
-        ]);
-
-        DB::commit();
-
-        return redirect()->back()->with('success', 'Thank you! Your request has been submitted successfully.');
-
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        // Validation errors
-        return redirect()->back()
-            ->withErrors($e->errors())
-            ->withInput()
-            ->with('error', 'Please fix the highlighted errors.');
-
-    } catch (\Exception $e) {
-        // DB or unexpected errors
-        DB::rollBack();
-        return redirect()->back()->with('error', 'Something went wrong! Please try again later.');
-    }
-}
     public function userFormDetails(Request $request)
     {
         if (!Session::has('admin_logged_in')) {
@@ -1259,35 +1229,6 @@ public function contactSubmit(Request $request)
             return response()->json(['success' => false, 'message' => 'Error deleting contact: ' . $e->getMessage()], 500);
         }
     }
-
-
-public function subscribeStore(Request $request)
-{
-    try {
-        $request->validate([
-            'email' => 'required|email|unique:subscriptions,email',
-        ]);
-
-        Subscription::create([
-            'email' => $request->email,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Thanks for subscribing!',
-        ]);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json([
-            'success' => false,
-            'message' => $e->errors()['email'][0],
-        ], 422);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Something went wrong. Try again.',
-        ], 500);
-    }
-}
 
     public function userSubscribeDetails(Request $request)
     {
