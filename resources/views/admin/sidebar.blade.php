@@ -72,8 +72,14 @@
             @php $adminRole = session('admin_role', 'admin'); @endphp
             @if($adminRole === 'admin')
             <li class="admin-sidebar-item">
-                <a href="{{ route('admin.settings') }}"
-                    class="admin-sidebar-link {{ request()->routeIs('admin.settings*') ? 'active' : '' }}">
+                <a href="{{ route('admin.staff') }}" class="admin-sidebar-link {{ request()->routeIs('admin.staff*') ? 'active' : '' }}">
+                    <i class="fas fa-users admin-sidebar-icon"></i>
+                    <span class="admin-sidebar-text">Staff Management</span>
+                </a>
+            </li>
+            
+            <li class="admin-sidebar-item">
+                <a href="{{ route('admin.settings') }}" class="admin-sidebar-link {{ request()->routeIs('admin.settings*') ? 'active' : '' }}">
                     <i class="fas fa-cog admin-sidebar-icon"></i>
                     <span class="admin-sidebar-text">Settings</span>
                 </a>

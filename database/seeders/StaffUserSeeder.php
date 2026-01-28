@@ -23,11 +23,11 @@ class StaffUserSeeder extends Seeder
                 'name' => 'Rajesh Kumar',
                 'role' => 'manager',
                 'login_email' => 'manager@hotelkiran.com',
-                'login_number' => '+919876543210',
+                'login_number' => '9876543210',
                 'personal_email' => 'rajesh.personal@gmail.com',
-                'personal_number' => '+919123456789',
+                'personal_number' => '9123456789',
                 'address' => '123, MG Road, New Delhi - 110001',
-                'password' => 'Manager@123', // Will be auto-hashed by model
+                'password' => '9876543210', // Auto-generated from login_number (will be hashed)
                 'is_active' => true,
                 'permissions' => [
                     'blogs' => true,
@@ -35,7 +35,7 @@ class StaffUserSeeder extends Seeder
                     'rooms' => true,
                     'hero_section' => true,
                     'user_forms' => true,
-                    'user_subscribe' => true,
+                    'subscriptions' => true,
                 ],
             ]
         );
@@ -45,13 +45,13 @@ class StaffUserSeeder extends Seeder
             ['login_email' => 'staff@hotelkiran.com'],
             [
                 'name' => 'Priya Sharma',
-                'role' => 'staff',
+                'role' => 'receptionist',
                 'login_email' => 'staff@hotelkiran.com',
-                'login_number' => '+919876543211',
+                'login_number' => '9876543211',
                 'personal_email' => 'priya.personal@gmail.com',
-                'personal_number' => '+919123456790',
+                'personal_number' => '9123456790',
                 'address' => '456, Connaught Place, New Delhi - 110002',
-                'password' => 'Staff@123', // Will be auto-hashed by model
+                'password' => '9876543211', // Auto-generated from login_number (will be hashed)
                 'is_active' => true,
                 'permissions' => [
                     'blogs' => true,
@@ -59,7 +59,7 @@ class StaffUserSeeder extends Seeder
                     'rooms' => true,
                     'hero_section' => false,
                     'user_forms' => true,
-                    'user_subscribe' => true,
+                    'subscriptions' => true,
                 ],
             ]
         );

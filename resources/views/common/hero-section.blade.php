@@ -73,13 +73,29 @@ $currentPage = $pageData[$routeName] ?? [
 $title = $currentPage['title'];
 $description = $currentPage['description'];
 $breadcrumbText = $currentPage['breadcrumb'];
-$backgroundImage = asset('images/heroimg3.jpg');
 @endphp
-
+<style>
+    
+</style>
 <section class="page-hero-section">
     <div class="page-hero-background">
-        <img src="{{ $backgroundImage }}" alt="{{ $title }}" class="page-hero-img"
-            onerror="this.onerror=null; this.src='{{ asset('images/heroimg3.jpg') }}';">
+           {{-- VIDEO BACKGROUND --}}
+        @if($heroBgVideo)
+            <video class="page-hero-img"
+                   autoplay
+                   muted
+                   loop
+                   playsinline>
+                <source src="{{ $heroBgVideo }}" type="video/mp4">
+            </video>
+
+        {{-- IMAGE BACKGROUND --}}
+        @else
+            <img src="{{ $heroBgImage ?? asset('images/heroimg3.jpg') }}"
+                 alt="{{ $title }}"
+                 class="page-hero-img"
+                 onerror="this.onerror=null; this.src='{{ asset('images/heroimg3.jpg') }}';">
+        @endif
         <div class="page-hero-overlay"></div>
     </div>
     <div class="page-hero-content">
