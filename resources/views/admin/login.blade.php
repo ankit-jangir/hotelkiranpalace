@@ -550,7 +550,7 @@
                                         </label>
                                     </div>
                                     <small class="text-muted d-block mt-1">
-                                        Staff login uses email or phone assigned in Staff settings.
+                                        Staff: Use your email as username and hotel phone number (10 digits) as password.
                                     </small>
                                 </div>
 

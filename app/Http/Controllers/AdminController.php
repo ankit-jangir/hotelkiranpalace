@@ -1286,7 +1286,10 @@ $data['sub_images'] = $subImages;
             $settings = AdminSetting::create([]);
         }
 
-        return view('admin.settings', compact('settings'));
+        // Get all staff users for access control section
+        $staffUsers = StaffUser::orderBy('name')->get();
+
+        return view('admin.settings', compact('settings', 'staffUsers'));
     }
 
     public function settingsStore(Request $request)

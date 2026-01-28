@@ -1,10 +1,19 @@
+@php
+    function dotWords($text) {
+        if (!$text) return '';
+        $words = preg_split('/\s+/', trim($text));
+        return collect($words)->map(fn($w) => '.' . $w)->implode(' ');
+    }
+@endphp
+
+
 @extends('common.layout')
 
 @section('title', 'Home - Hotel Kiran Place')
 
 @section('content')
 <!-- Hero Section with Slider -->
-<section class="hero-slider-section position-relative">
+{{-- <section class="hero-slider-section position-relative">
     <!-- Video Background (Fallback when images not available) -->
     <div class="hero-video-background position-absolute top-0 start-0 w-100 h-100" style="display: none; z-index: 1;">
         <video autoplay muted loop playsinline class="w-100 h-100 hero-video" style="object-fit: cover;">
@@ -114,7 +123,149 @@
             <i class="fas fa-chevron-down text-white" style="font-size: 1.5rem; animation: bounce 2s infinite;"></i>
         </div>
     </div>
+</section> --}}
+{{-- ================= VIDEO TYPE ================= --}}
+@if($heroType === 'video' && $heroVideo)
+
+<section class="hero-slider-section position-relative" style="min-height:100vh; overflow:hidden;">
+
+    {{-- VIDEO --}}
+    <video autoplay muted loop playsinline
+           class="position-absolute top-0 start-0 w-100 h-100"
+           style="object-fit:cover; z-index:1;">
+        <source src="{{ $heroVideo }}" type="video/mp4">
+    </video>
+
+    {{-- OVERLAY --}}
+    <div class="position-absolute top-0 start-0 w-100 h-100 hero-video-overlay"
+         style="z-index:2;"></div>
+
+    {{-- TEXT SLIDER --}}
+    <div id="heroVideoText"
+         class="carousel slide position-relative"
+         data-bs-ride="carousel"
+         data-bs-interval="4000"
+         style="z-index:3; min-height:100vh;">
+
+        <div class="carousel-inner h-100">
+
+            {{-- SLIDE 1 --}}
+            <div class="carousel-item active h-100">
+                <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100 text-center">
+
+                    <p class="hero-subtitle mb-2">
+                        {{ $heroTexts['main_title'] }}
+                    </p>
+
+                    <h1 class="hero-title mb-3">
+                        {{ $heroTexts['main_desc'] }}
+                    </h1>
+
+                    <p class="hero-tagline mb-4">
+                        {{ dotWords($heroTexts['main_desc']) }}
+                    </p>
+
+                    <div class="hero-buttons d-flex gap-3 justify-content-center">
+                        <a href="{{ route('contact') }}" class="btn btn-hero-primary">Book Now</a>
+                        <a href="{{ route('rooms') }}" class="btn btn-hero-outline">Explore Rooms</a>
+                    </div>
+                </div>
+            </div>
+
+            {{-- SLIDE 2 --}}
+            <div class="carousel-item h-100">
+                <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100 text-center">
+
+                    <p class="hero-subtitle mb-2">
+                        {{ $heroTexts['video_title'] }}
+                    </p>
+
+                    <h1 class="hero-title mb-3">
+                        {{ $heroTexts['video_desc'] }}
+                    </h1>
+
+                    <p class="hero-tagline mb-4">
+                        {{ dotWords($heroTexts['video_extra']) }}
+                    </p>
+
+                    <div class="hero-buttons d-flex gap-3 justify-content-center">
+                        <a href="{{ route('rooms') }}" class="btn btn-hero-primary">Romantic Packages</a>
+                        <a href="{{ route('contact') }}" class="btn btn-hero-outline">Book Now</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
 </section>
+
+
+{{-- ================= IMAGE TYPE ================= --}}
+@elseif($heroType === 'image' && !empty($heroImages))
+
+    <div id="heroCarousel"
+         class="carousel slide carousel-fade"
+         data-bs-ride="carousel"
+         data-bs-interval="5000">
+
+        {{-- INDICATORS --}}
+        <div class="carousel-indicators">
+            @foreach($heroImages as $i => $img)
+                <button type="button"
+                        data-bs-target="#heroCarousel"
+                        data-bs-slide-to="{{ $i }}"
+                        class="{{ $i === 0 ? 'active' : '' }}"></button>
+            @endforeach
+        </div>
+
+        {{-- SLIDES --}}
+        <div class="carousel-inner">
+
+            @foreach($heroImages as $i => $img)
+            <div class="carousel-item {{ $i === 0 ? 'active' : '' }} position-relative">
+
+                <img src="{{ asset('storage/'.$img['image']) }}"
+                     class="d-block w-100"
+                     style="min-height:100vh; object-fit:cover;">
+
+                <div class="carousel-overlay position-absolute top-0 start-0 w-100 h-100"></div>
+
+                <div class="carousel-caption position-absolute top-50 start-50 translate-middle text-center w-100">
+
+                    <p class="hero-subtitle mb-2">
+                        {{ $img['title'] }}
+                    </p>
+
+                    <h1 class="hero-title mb-3">
+                        {{ $img['title'] }}
+                    </h1>
+
+                    <p class="hero-tagline mb-4">
+                        {{ dotWords($img['description']) }}
+                    </p>
+
+                  <div class="hero-buttons d-flex gap-3 justify-content-center">
+                        <a href="{{ route('rooms') }}" class="btn btn-hero-primary"><span>Romantic Packages</span></a>
+                        <a href="{{ route('contact') }}" class="btn btn-hero-outline"><span>Book Now</span></a>
+                    </div>
+
+                </div>
+            </div>
+            @endforeach
+
+        </div>
+
+        {{-- SCROLL ICON --}}
+        <div class="hero-scroll-indicator position-absolute bottom-0 start-50 translate-middle-x mb-3">
+            <i class="fas fa-chevron-down text-white"
+               style="font-size:1.5rem; animation:bounce 2s infinite;"></i>
+        </div>
+    </div>
+@endif
+
+</section>
+
 
 <!-- Latest Blog Section (Common Component) -->
 @include('common.latest-blog')
@@ -194,6 +345,7 @@
 @include('common.gallery-preview')
 
 <!-- Instagram Section (Common Component) -->
+{{-- @include('common.instagram-section') --}}
 @include('common.instagram-section')
 
 <!-- Visit Hotel Kiran Palace Section (Common Component) -->
