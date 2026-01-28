@@ -93,6 +93,11 @@ public function gallery()
         return view('website.blog');
     }
 
+    public function blogDetail($slug)
+    {
+        return view('website.blogdetail');
+    }
+
     public function bookingPolicy()
     {
         return view('website.booking-policy');

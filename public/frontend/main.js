@@ -396,9 +396,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // ========================================
     const roomGalleryModal = document.getElementById("roomGalleryModal");
     if (roomGalleryModal) {
-        const galleryThumbnails = roomGalleryModal.querySelectorAll(
-            "image.png.gallery-thumbnail",
-        );
+        const galleryThumbnails =
+            roomGalleryModal.querySelectorAll(".gallery-thumbnail");
+
         const galleryMainImage = document.getElementById("galleryMainImage");
 
         // Handle thumbnail clicks
@@ -817,17 +817,12 @@ document
 document.addEventListener("DOMContentLoaded", () => {
     // MAIN SWIPER (page view)
     const mainSwiper = new Swiper(".gallery-main-swiper", {
+        slidesPerView: 1,
+        spaceBetween: 20,
         loop: true,
-        centeredSlides: true,
-        slidesPerView: 1.3,
-        spaceBetween: 24,
         navigation: {
             nextEl: ".main-next",
             prevEl: ".main-prev",
-        },
-        breakpoints: {
-            768: { slidesPerView: 2 },
-            1024: { slidesPerView: 3 },
         },
     });
 
@@ -843,9 +838,10 @@ document.addEventListener("DOMContentLoaded", () => {
             document.body.style.overflow = "hidden";
 
             if (!modalSwiper) {
-                modalSwiper = new Swiper(".gallery-modal-swiper", {
-                    loop: true,
+                const modalSwiper = new Swiper(".gallery-modal-swiper", {
                     slidesPerView: 1,
+                    spaceBetween: 20,
+                    loop: true,
                     navigation: {
                         nextEl: ".modal-next",
                         prevEl: ".modal-prev",
@@ -873,3 +869,169 @@ modalSwiper?.on("slideChangeTransitionEnd", () => {
         img.style.opacity = "1";
     });
 });
+
+/* ========================================
+   ROOM GALLERY MODAL FUNCTIONS
+   ======================================== */
+let currentRoomGalleryImages = [];
+let currentImageIndex = 0;
+let currentRoomId = null;
+
+function openRoomGalleryModal(roomId) {
+    // Find room in global data
+    const room = window.allRoomsData.find((r) => r.id === roomId);
+
+    if (!room) {
+        console.error("Room not found:", roomId);
+        return;
+    }
+
+    currentRoomId = roomId;
+    currentRoomGalleryImages = room.sub_images || [room.main_image];
+    currentImageIndex = 0;
+
+    // Update modal title
+    document.getElementById("roomGalleryTitle").textContent =
+        room.title + " - Gallery";
+
+    // Set main image
+    updateRoomMainImage();
+
+    // Create thumbnails
+    const thumbContainer = document.getElementById("galleryThumbnails");
+    thumbContainer.innerHTML = "";
+
+    currentRoomGalleryImages.forEach((img, index) => {
+        const thumb = document.createElement("img");
+        thumb.src = img;
+        thumb.alt = `Image ${index + 1}`;
+        thumb.className = `gallery-thumbnail ${index === 0 ? "active" : ""}`;
+        thumb.style.cursor = "pointer";
+        thumb.onclick = () => {
+            currentImageIndex = index;
+            updateRoomMainImage();
+        };
+        thumbContainer.appendChild(thumb);
+    });
+
+    // Show modal
+    const modal = new bootstrap.Modal(
+        document.getElementById("roomGalleryModal"),
+    );
+    modal.show();
+}
+
+function updateRoomMainImage() {
+    const mainImg = document.getElementById("galleryMainImage");
+    if (mainImg && currentRoomGalleryImages.length > 0) {
+        mainImg.src = currentRoomGalleryImages[currentImageIndex];
+        document.getElementById("imageCounter").textContent =
+            currentImageIndex + 1 + " / " + currentRoomGalleryImages.length;
+
+        // Update active thumbnail
+        document
+            .querySelectorAll("#galleryThumbnails .gallery-thumbnail")
+            .forEach((thumb, index) => {
+                thumb.classList.toggle("active", index === currentImageIndex);
+            });
+    }
+}
+
+function nextRoomImage() {
+    if (currentRoomGalleryImages.length > 0) {
+        currentImageIndex =
+            (currentImageIndex + 1) % currentRoomGalleryImages.length;
+        updateRoomMainImage();
+    }
+}
+
+function prevRoomImage() {
+    if (currentRoomGalleryImages.length > 0) {
+        currentImageIndex =
+            (currentImageIndex - 1 + currentRoomGalleryImages.length) %
+            currentRoomGalleryImages.length;
+        updateRoomMainImage();
+    }
+}
+
+/* ========================================
+   LOAD MORE ROOMS FUNCTIONALITY
+   ======================================== */
+let currentRoomsLoaded = 0;
+const ROOMS_PER_LOAD = 6;
+
+window.allRoomsData = window.roomsData; // mapping fix
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadMoreRooms(); // initial 6 load
+});
+
+function loadMoreRooms() {
+    const roomsContainer = document.getElementById("roomsContainer");
+    const btn = document.getElementById("loadMoreBtn");
+
+    const nextIndex = currentRoomsLoaded;
+    const endIndex = Math.min(
+        currentRoomsLoaded + ROOMS_PER_LOAD,
+        window.allRoomsData.length,
+    );
+
+    for (let i = nextIndex; i < endIndex; i++) {
+        roomsContainer.insertAdjacentHTML(
+            "beforeend",
+            createRoomCard(window.allRoomsData[i]),
+        );
+    }
+
+    currentRoomsLoaded = endIndex;
+
+    if (currentRoomsLoaded >= window.allRoomsData.length) {
+        btn.style.display = "none";
+    }
+}
+
+function createRoomCard(room) {
+    const featuresHTML = room.features
+        .slice(0, 2)
+        .map(
+            (f) => `
+            <div class="room-amenity-item mb-2">
+                <i class="fas ${f.icon} me-2"></i>
+                <span>${f.text}</span>
+            </div>`,
+        )
+        .join("");
+
+    return `
+    <div class="col-xl-3 col-lg-6 col-md-6 col-12">
+        <div class="royal-room-card position-relative">
+            <div class="room-image-wrapper position-relative">
+                <img src="${room.image}" class="room-main-image" loading="lazy">
+            </div>
+
+            <div class="room-card-content">
+                <h3 class="room-card-title">${room.title}</h3>
+
+                <div class="room-amenities mb-3">
+                    ${featuresHTML}
+                </div>
+
+                <p class="room-member-rates">Member Rates starting from</p>
+
+                <div class="room-price-full mb-3">
+                    <span class="room-price">${room.price}</span>
+                    <span class="room-price-suffix">/Night</span>
+                </div>
+
+                <div class="room-card-actions d-flex justify-content-between">
+                    <a href="/room/${room.slug}" class="room-details-link">
+                        Room Details
+                    </a>
+                    <a href="/contact" class="btn-room-book">
+                        Book Your Stay
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>`;
+}
