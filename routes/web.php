@@ -17,7 +17,6 @@ Route::get('/terms', [WebsiteController::class, 'terms'])->name('terms');
 Route::get('/privacy', [WebsiteController::class, 'privacy'])->name('privacy');
 Route::get('/faq', [WebsiteController::class, 'faq'])->name('faq');
 Route::get('/blog', [WebsiteController::class, 'blog'])->name('blog');
-Route::get('/blogdetail', [WebsiteController::class, 'blogdetail'])->name('website.blogdetail');
 Route::get('/booking-policy', [WebsiteController::class, 'bookingPolicy'])->name('booking.policy');
 Route::get('/cancellation-policy', [WebsiteController::class, 'cancellationPolicy'])->name('cancellation.policy');
 
@@ -26,7 +25,7 @@ Route::get('/login/hotelkiranpalace/admin', [AdminController::class, 'showLogin'
 Route::post('/login/hotelkiranpalace/admin', [AdminController::class, 'login'])->name('admin.login.submit');
 
 // Admin Routes (Protected)
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->middleware('admin.session')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/profile', [AdminController::class, 'profile'])->name('admin.profile');
     Route::get('/blogs', [AdminController::class, 'blogs'])->name('admin.blogs');
@@ -62,6 +61,19 @@ Route::prefix('admin')->group(function () {
     Route::delete('/contacts/{id}', [AdminController::class, 'contactDelete'])->name('admin.contacts.delete');
     Route::get('/user-subscribe-details', [AdminController::class, 'userSubscribeDetails'])->name('admin.user-subscribe-details');
     Route::post('/subscriptions/bulk-delete', [AdminController::class, 'bulkDeleteSubscriptions'])->name('admin.subscriptions.bulk-delete');
+    Route::post('/subscribe', [AdminController::class, 'store'])
+    ->name('subscribe.store');
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
+    Route::post('/settings', [AdminController::class, 'settingsStore'])->name('admin.settings.store');
+    Route::put('/settings/{id}', [AdminController::class, 'settingsUpdate'])->name('admin.settings.update');
+    Route::get('/profile', [AdminController::class, 'profile'])->name('admin.profile');
+    Route::post('/profile', [AdminController::class, 'profileUpdate'])->name('admin.profile.update');
+    Route::post('/send-otp', [AdminController::class, 'sendOTP'])->name('admin.send-otp');
+    Route::post('/verify-otp', [AdminController::class, 'verifyOTP'])->name('admin.verify-otp');
+    Route::post('/reset-password-otp', [AdminController::class, 'resetPasswordOTP'])->name('admin.reset-password-otp');
+});
+
+// Logout route (outside middleware so user can logout even if password changed)
+Route::prefix('admin')->group(function () {
     Route::post('/logout', [AdminController::class, 'logout'])->name('admin.logout');
 });

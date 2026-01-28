@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Cache;
 use App\Models\Blog;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -11,6 +14,9 @@ use App\Models\Gallery;
 use App\Models\Subscription;
 use App\Models\HeroSection;
 use App\Models\Room;
+use App\Models\Contact;
+use App\Models\AdminSetting;
+use App\Models\StaffUser;
 use Carbon\Carbon;
 class AdminController extends Controller
 {
@@ -26,14 +32,99 @@ class AdminController extends Controller
     {
         $username = $request->input('username');
         $password = $request->input('password');
+        $loginType = $request->input('login_type', 'admin'); // admin or staff
+        $key = 'login_attempts_' . $request->ip();
 
-        // Hardcoded credentials
-        if ($username === 'admin@gmail.com' && $password === 'Admin@123') {
-            Session::put('admin_logged_in', true);
-            Session::put('admin_username', $username);
-            Session::put('admin_login_time', now());
+        // Rate limiting: 4 attempts per minute (60 seconds)
+        $attempts = RateLimiter::attempts($key);
+        if ($attempts >= 4) {
+            $seconds = RateLimiter::availableIn($key);
+            $minutes = ceil($seconds / 60);
+            $message = $minutes > 1 
+                ? "Too many login attempts. Please try again in {$minutes} minutes." 
+                : "Too many login attempts. Please try again in 1 minute.";
+            
+            // Return JSON for AJAX requests
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'error' => $message,
+                    'rate_limited' => true,
+                    'seconds_remaining' => $seconds
+                ], 429);
+            }
+            
+            return back()->with('error', $message)->withInput($request->except('password'));
+        }
 
-            return redirect()->route('admin.dashboard')->with('success', 'Welcome back, Admin!');
+        if ($loginType === 'staff') {
+            // Staff login: use StaffUser table (login_email or login_number)
+            $staff = StaffUser::where('login_email', $username)
+                ->orWhere('login_number', $username)
+                ->first();
+
+            if ($staff && $staff->is_active && Hash::check($password, $staff->password)) {
+                RateLimiter::clear($key);
+                Session::put('admin_logged_in', true);
+                Session::put('admin_role', 'staff');
+                Session::put('staff_id', $staff->id);
+                Session::put('admin_username', $staff->name ?? 'Staff');
+                Session::put('admin_email', $staff->login_email ?? '');
+                Session::put('admin_login_time', now());
+
+                return redirect()->route('admin.dashboard')->with('success', 'Welcome back, ' . ($staff->name ?? 'Staff') . '!');
+            }
+        } else {
+            // Admin login (existing behaviour)
+            $adminSettings = AdminSetting::first();
+            
+            if ($adminSettings && $adminSettings->admin_email && $adminSettings->admin_password) {
+                if ($username === $adminSettings->admin_email && Hash::check($password, $adminSettings->admin_password)) {
+                    RateLimiter::clear($key);
+                    Session::put('admin_logged_in', true);
+                    Session::put('admin_role', 'admin');
+                    Session::put('admin_username', $adminSettings->admin_name ?? 'Admin');
+                    Session::put('admin_email', $adminSettings->admin_email);
+                    Session::put('admin_password_hash', $adminSettings->admin_password);
+                    Session::put('admin_login_time', now());
+
+                    return redirect()->route('admin.dashboard')->with('success', 'Welcome back, ' . ($adminSettings->admin_name ?? 'Admin') . '!');
+                }
+            } else {
+                // Fallback default admin for first time
+                if ($username === 'admin@gmail.com' && $password === 'Admin@123') {
+                    if (!$adminSettings) {
+                        $adminSettings = AdminSetting::create([
+                            'admin_name' => 'admin',
+                            'admin_email' => 'admin@gmail.com',
+                            'admin_password' => 'Admin@123',
+                        ]);
+                    }
+                    RateLimiter::clear($key);
+                    Session::put('admin_logged_in', true);
+                    Session::put('admin_role', 'admin');
+                    Session::put('admin_username', 'admin');
+                    Session::put('admin_email', 'admin@gmail.com');
+                    Session::put('admin_password_hash', $adminSettings->admin_password);
+                    Session::put('admin_login_time', now());
+
+                    return redirect()->route('admin.dashboard')->with('success', 'Welcome back, Admin!');
+                }
+            }
+        }
+
+            // Increment rate limiter on failed attempt
+            RateLimiter::hit($key, 60); // 60 seconds = 1 minute
+
+        // Check if rate limited after failed attempt
+        $attempts = RateLimiter::attempts($key);
+        if ($attempts >= 4) {
+            $seconds = RateLimiter::availableIn($key);
+            $minutes = ceil($seconds / 60);
+            $message = $minutes > 1 
+                ? "Too many login attempts. Please try again in {$minutes} minutes." 
+                : "Too many login attempts. Please try again in 1 minute.";
+            return back()->with('error', $message)->withInput($request->except('password'));
         }
 
         return back()->with('error', 'Invalid email or password.')->withInput($request->except('password'));
@@ -41,41 +132,44 @@ class AdminController extends Controller
 
     public function logout()
     {
-        Session::forget(['admin_logged_in', 'admin_username', 'admin_login_time']);
+        Session::forget([
+            'admin_logged_in',
+            'admin_role',
+            'admin_username',
+            'admin_email',
+            'admin_password_hash',
+            'admin_login_time',
+            'staff_id',
+        ]);
         return redirect()->route('admin.login')->with('success', 'You have been logged out successfully.');
     }
 
     public function dashboard()
     {
-        if (!Session::has('admin_logged_in')) {
-            return redirect()->route('admin.login')->with('error', 'Please login to access admin panel.');
-        }
 
-        // Get counts
+        // Get counts from database
         $totalBlogs = Blog::count();
         $totalImages = Gallery::where('type', 'image')->count();
-        $totalRooms = 8; // Dummy data - replace when Room model exists
-        $totalInquiries = 23; // Dummy data - replace when Inquiry model exists
+        $totalRooms = Room::count();
+        $totalInquiries = Contact::count();
 
-        // Get recent subscribe users (dummy data - replace when Subscribe model exists)
-        $subscribeUsers = [
-            ['id' => 1, 'email' => 'user1@example.com', 'created_at' => now()->subDays(5)],
-            ['id' => 2, 'email' => 'user2@example.com', 'created_at' => now()->subDays(4)],
-            ['id' => 3, 'email' => 'user3@example.com', 'created_at' => now()->subDays(3)],
-            ['id' => 4, 'email' => 'user4@example.com', 'created_at' => now()->subDays(2)],
-            ['id' => 5, 'email' => 'user5@example.com', 'created_at' => now()->subDays(1)],
-        ];
-        $totalSubscribes = 15; // Dummy count
+        // Get current month start and end dates
+        $currentMonthStart = Carbon::now()->startOfMonth();
+        $currentMonthEnd = Carbon::now()->endOfMonth();
 
-        // Get recent form submissions (dummy data - replace when FormSubmission model exists)
-        $formSubmissions = [
-            ['id' => 1, 'name' => 'John Doe', 'email' => 'john@example.com', 'phone' => '+91 98765 43210', 'created_at' => now()->subDays(5), 'status' => 'pending'],
-            ['id' => 2, 'name' => 'Jane Smith', 'email' => 'jane@example.com', 'phone' => '+91 98765 43211', 'created_at' => now()->subDays(4), 'status' => 'responded'],
-            ['id' => 3, 'name' => 'Mike Johnson', 'email' => 'mike@example.com', 'phone' => '+91 98765 43212', 'created_at' => now()->subDays(3), 'status' => 'responded'],
-            ['id' => 4, 'name' => 'Sarah Williams', 'email' => 'sarah@example.com', 'phone' => '+91 98765 43213', 'created_at' => now()->subDays(2), 'status' => 'pending'],
-            ['id' => 5, 'name' => 'David Brown', 'email' => 'david@example.com', 'phone' => '+91 98765 43214', 'created_at' => now()->subDays(1), 'status' => 'responded'],
-        ];
-        $totalFormSubmissions = 23; // Dummy count
+        // Get subscribe users from current month only
+        $subscribeUsers = Subscription::whereBetween('created_at', [$currentMonthStart, $currentMonthEnd])
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+        $totalSubscribes = Subscription::whereBetween('created_at', [$currentMonthStart, $currentMonthEnd])->count();
+
+        // Get form submissions from current month only
+        $formSubmissions = Contact::whereBetween('created_at', [$currentMonthStart, $currentMonthEnd])
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+        $totalFormSubmissions = Contact::whereBetween('created_at', [$currentMonthStart, $currentMonthEnd])->count();
 
         return view('admin.dashboard', compact(
             'totalBlogs',
@@ -95,7 +189,100 @@ class AdminController extends Controller
             return redirect()->route('admin.login')->with('error', 'Please login to access admin panel.');
         }
 
-        return view('admin.profile');
+        $adminSettings = AdminSetting::first();
+        return view('admin.profile', compact('adminSettings'));
+    }
+
+    public function profileUpdate(Request $request)
+    {
+        if (!Session::has('admin_logged_in')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        try {
+            $request->validate([
+                'admin_name' => 'nullable|string|max:255',
+                'admin_email' => 'nullable|email|max:255',
+                'admin_email_1' => 'nullable|email|max:255',
+                'admin_email_2' => 'nullable|email|max:255',
+                'admin_number_1' => 'nullable|string|max:50',
+                'admin_number_2' => 'nullable|string|max:50',
+                'admin_password' => 'nullable|string|min:6|max:255',
+                'current_password' => 'nullable|string',
+            ]);
+
+            $adminSettings = AdminSetting::first();
+            if (!$adminSettings) {
+                $adminSettings = AdminSetting::create([]);
+            }
+
+            $updateData = [];
+
+            // Update name if provided
+            if ($request->has('admin_name')) {
+                $updateData['admin_name'] = $request->admin_name;
+            }
+
+            // Update email if provided
+            if ($request->has('admin_email') && $request->admin_email) {
+                $updateData['admin_email'] = $request->admin_email;
+            }
+
+            // Update admin emails and numbers
+            if ($request->has('admin_email_1')) {
+                $updateData['admin_email_1'] = $request->admin_email_1;
+            }
+            if ($request->has('admin_email_2')) {
+                $updateData['admin_email_2'] = $request->admin_email_2;
+            }
+            if ($request->has('admin_number_1')) {
+                $updateData['admin_number_1'] = $request->admin_number_1;
+            }
+            if ($request->has('admin_number_2')) {
+                $updateData['admin_number_2'] = $request->admin_number_2;
+            }
+
+            // Check if password is being changed
+            $passwordChanged = false;
+            if ($request->admin_password) {
+                // Verify current password if provided
+                if ($request->current_password && $adminSettings->admin_password) {
+                    if (!Hash::check($request->current_password, $adminSettings->admin_password)) {
+                        return response()->json(['success' => false, 'message' => 'Current password is incorrect'], 422);
+                    }
+                }
+                $updateData['admin_password'] = $request->admin_password;
+                $passwordChanged = true;
+            }
+
+            $adminSettings->update($updateData);
+
+            // Update session
+            if (isset($updateData['admin_name'])) {
+                Session::put('admin_username', $updateData['admin_name']);
+            }
+            if (isset($updateData['admin_email'])) {
+                Session::put('admin_email', $updateData['admin_email']);
+            }
+            
+            // If password changed, update session password hash (this will invalidate other sessions)
+            if ($passwordChanged) {
+                Session::put('admin_password_hash', $adminSettings->fresh()->admin_password);
+            }
+
+            return response()->json([
+                'success' => true, 
+                'message' => $passwordChanged ? 'Profile and password updated successfully! Please login again on other devices.' : 'Profile updated successfully!'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error updating profile: ' . $e->getMessage()], 500);
+        }
     }
 
     public function blogs(Request $request)
@@ -314,36 +501,46 @@ public function store(Request $request)
     try {
         $type = $request->input('type', 'image');
         
-        if ($type === 'image') {
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'heading' => 'nullable|string|max:255',
-                'description' => 'nullable|string',
-                'main_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'images' => 'nullable|array',
-                'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            ]);
-            
-            // Store main image
-            $mainImagePath = $request->file('main_image')->store('gallery', 'public');
-            
-            // Store sub images
-            $subImages = [];
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $subImages[] = 'storage/' . $image->store('gallery/sub', 'public');
-                }
+       if ($type === 'image') {
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'heading' => 'nullable|string|max:255',
+        'description' => 'nullable|string',
+        'main_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'images' => 'nullable|array',
+        'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
+
+    $mainImagePath = $request->file('main_image')->store('gallery', 'public');
+
+    // 👇 duplicate-safe logic here
+    $subImages = [];
+    $imageHashes = [];
+
+    if ($request->hasFile('images')) {
+        foreach ($request->file('images') as $image) {
+            $hash = md5_file($image->getRealPath());
+
+            if (in_array($hash, $imageHashes)) {
+                continue;
             }
-            
-            Gallery::create([
-                'name' => $request->name,
-                'heading' => $request->heading,
-                'description' => $request->description,
-                'main_image' => 'storage/' . $mainImagePath,
-                'sub_images' => $subImages,
-                'type' => 'image',
-            ]);
-        } else if ($type === 'video') {
+
+            $path = $image->store('gallery/sub', 'public');
+            $subImages[] = $path;
+            $imageHashes[] = $hash;
+        }
+    }
+
+    Gallery::create([
+        'name' => $request->name,
+        'heading' => $request->heading,
+        'description' => $request->description,
+        'main_image' => $mainImagePath,
+        'sub_images' => $subImages,
+        'type' => 'image',
+    ]);
+}
+ else if ($type === 'video') {
             $request->validate([
                 'name' => 'required|string|max:255',
                 'heading' => 'nullable|string|max:255',
@@ -358,7 +555,7 @@ public function store(Request $request)
                 'name' => $request->name,
                 'heading' => $request->heading,
                 'description' => $request->description,
-                'main_image' => 'storage/' . $mainVideoPath, // Store video path in main_image for compatibility
+                'main_image' =>  $mainVideoPath, // Store video path in main_image for compatibility
                 'type' => 'video',
             ]);
         } else {
@@ -385,7 +582,19 @@ public function galleryShow($id)
 
     try {
         $gallery = Gallery::findOrFail($id);
-        
+         // ✅ helper function (local)
+        $makeUrl = function ($path) {
+            if (!$path) return null;
+
+            // agar already full URL hai
+            if (str_starts_with($path, 'http')) {
+                return $path;
+            }
+
+            // storage path ko public URL banao
+            return asset('storage/' . ltrim($path, '/'));
+        };
+
         // Process sub_images to extract paths
         $subImages = [];
         if ($gallery->sub_images && is_array($gallery->sub_images)) {
@@ -463,7 +672,8 @@ public function galleryDelete($id)
             });
         }
 
-        $rooms = $query->orderBy('order')->orderBy('created_at', 'desc')->paginate($perPage)->appends($request->query());
+        // Newest items first (so newly added appears on top)
+        $rooms = $query->orderBy('created_at', 'desc')->orderBy('order')->paginate($perPage)->appends($request->query());
 
         return view('admin.rooms', compact('rooms', 'search'));
     }
@@ -497,31 +707,34 @@ public function galleryDelete($id)
             ];
 
             // Handle main image - save to public/img/rooms
-            if ($request->hasFile('main_image')) {
-                $file = $request->file('main_image');
-                $filename = time() . '_main.' . $file->getClientOriginalExtension();
-                $imgPath = public_path('img/rooms');
-                if (!file_exists($imgPath)) {
-                    mkdir($imgPath, 0755, true);
-                }
-                $file->move($imgPath, $filename);
-                $data['main_image'] = 'img/rooms/' . $filename;
-            }
+            // if ($request->hasFile('main_image')) {
+            //     $file = $request->file('main_image');
+            //     $filename = time() . '_main.' . $file->getClientOriginalExtension();
+            //     $imgPath = public_path('img/rooms');
+            //     if (!file_exists($imgPath)) {
+            //         mkdir($imgPath, 0755, true);
+            //     }
+            //     $file->move($imgPath, $filename);
+            //     $data['main_image'] = 'img/rooms/' . $filename;
+            // }
+if ($request->hasFile('main_image')) {
+    // auto creates: storage/app/public/rooms
+    $path = $request->file('main_image')->store('rooms', 'public');
 
+    // DB me sirf relative path
+    $data['main_image'] = $path; // rooms/xxxx.jpg
+}
             // Handle sub images - save to public/img/rooms
-            $subImages = [];
-            if ($request->hasFile('sub_images')) {
-                $imgPath = public_path('img/rooms');
-                if (!file_exists($imgPath)) {
-                    mkdir($imgPath, 0755, true);
-                }
-                foreach ($request->file('sub_images') as $file) {
-                    $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                    $file->move($imgPath, $filename);
-                    $subImages[] = 'img/rooms/' . $filename;
-                }
-            }
-            $data['sub_images'] = $subImages;
+           $subImages = [];
+
+if ($request->hasFile('sub_images')) {
+    foreach ($request->file('sub_images') as $file) {
+        $subImages[] = $file->store('rooms/sub', 'public');
+    }
+}
+
+$data['sub_images'] = $subImages;
+
 
             Room::create($data);
 
@@ -744,7 +957,8 @@ public function galleryDelete($id)
             }
         }
 
-        $heroSections = $query->orderBy('order')->orderBy('created_at', 'desc')->paginate($perPage)->appends($request->query());
+        // Newest items first (so newly added appears on top)
+        $heroSections = $query->orderBy('created_at', 'desc')->orderBy('order')->paginate($perPage)->appends($request->query());
 
         return view('admin.hero-section', compact('heroSections', 'search'));
     }
@@ -779,7 +993,7 @@ public function galleryDelete($id)
                         $path = $file->storeAs('hero_sections', $filename, 'public');
                         
                         $images[] = [
-                            'image' => 'storage/' . $path,
+                            'image' => $path,
                             'title' => $request->input("image_title_$i", ''),
                             'description' => $request->input("image_description_$i", '')
                         ];
@@ -791,7 +1005,7 @@ public function galleryDelete($id)
                     $file = $request->file('video');
                     $filename = time() . '_video.' . $file->getClientOriginalExtension();
                     $path = $file->storeAs('hero_sections', $filename, 'public');
-                    $data['video'] = 'storage/' . $path;
+                    $data['video'] =  $path;
                 }
                 $data['video_title'] = $request->video_title;
                 $data['video_description'] = $request->video_description;
@@ -843,7 +1057,7 @@ public function galleryDelete($id)
                         $path = $file->storeAs('hero_sections', $filename, 'public');
                         
                         $images[] = [
-                            'image' => 'storage/' . $path,
+                            'image' => $path,
                             'title' => $request->input("image_title_$i", ''),
                             'description' => $request->input("image_description_$i", '')
                         ];
@@ -861,7 +1075,7 @@ public function galleryDelete($id)
                     $file = $request->file('video');
                     $filename = time() . '_video.' . $file->getClientOriginalExtension();
                     $path = $file->storeAs('hero_sections', $filename, 'public');
-                    $data['video'] = 'storage/' . $path;
+                    $data['video'] =  $path;
                 } elseif ($request->has('existing_video')) {
                     $data['video'] = $request->existing_video;
                 }
@@ -1066,6 +1280,488 @@ public function galleryDelete($id)
             return redirect()->route('admin.login')->with('error', 'Please login to access admin panel.');
         }
 
-        return view('admin.settings');
+        // Get or create single settings record
+        $settings = AdminSetting::first();
+        if (!$settings) {
+            $settings = AdminSetting::create([]);
+        }
+
+        return view('admin.settings', compact('settings'));
+    }
+
+    public function settingsStore(Request $request)
+    {
+        if (!Session::has('admin_logged_in')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        try {
+            $request->validate([
+                // Staff
+                'staff_email_1' => 'nullable|email|max:255',
+                'staff_email_2' => 'nullable|email|max:255',
+                'staff_email_3' => 'nullable|email|max:255',
+                'staff_number_1' => 'nullable|string|max:50',
+                'staff_number_2' => 'nullable|string|max:50',
+                'staff_number_3' => 'nullable|string|max:50',
+                // Admin (at least 1 email and 1 number required)
+                'admin_email_1' => 'nullable|email|max:255',
+                'admin_email_2' => 'nullable|email|max:255',
+                'admin_number_1' => 'nullable|string|max:50',
+                'admin_number_2' => 'nullable|string|max:50',
+                // Address
+                'address' => 'nullable|string|max:500',
+            ]);
+
+            // Custom validation: At least 1 admin email and 1 admin number required
+            $adminEmails = array_filter([
+                $request->admin_email_1,
+                $request->admin_email_2,
+            ]);
+            
+            $adminNumbers = array_filter([
+                $request->admin_number_1,
+                $request->admin_number_2,
+            ]);
+
+            if (empty($adminEmails)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'At least one admin email is required',
+                    'errors' => ['admin_email_1' => ['At least one admin email is required']]
+                ], 422);
+            }
+
+            if (empty($adminNumbers)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'At least one admin number is required',
+                    'errors' => ['admin_number_1' => ['At least one admin number is required']]
+                ], 422);
+            }
+
+            // Get or create settings record
+            $settings = AdminSetting::first();
+            if (!$settings) {
+                $settings = AdminSetting::create([]);
+            }
+
+            $settings->update($request->only([
+                'staff_email_1', 'staff_email_2', 'staff_email_3',
+                'staff_number_1', 'staff_number_2', 'staff_number_3',
+                'admin_email_1', 'admin_email_2',
+                'admin_number_1', 'admin_number_2',
+                'address'
+            ]));
+
+            return response()->json(['success' => true, 'message' => 'Settings saved successfully!', 'settings' => $settings]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error saving settings: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function settingsShow($id)
+    {
+        if (!Session::has('admin_logged_in')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        try {
+            $settings = AdminSetting::findOrFail($id);
+            return response()->json(['success' => true, 'settings' => $settings]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Settings not found'], 404);
+        }
+    }
+
+    public function settingsUpdate(Request $request, $id)
+    {
+        if (!Session::has('admin_logged_in')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        try {
+            $settings = AdminSetting::findOrFail($id);
+
+            $request->validate([
+                // Staff
+                'staff_email_1' => 'nullable|email|max:255',
+                'staff_email_2' => 'nullable|email|max:255',
+                'staff_email_3' => 'nullable|email|max:255',
+                'staff_number_1' => 'nullable|string|max:50',
+                'staff_number_2' => 'nullable|string|max:50',
+                'staff_number_3' => 'nullable|string|max:50',
+                // Admin (at least 1 email and 1 number required)
+                'admin_email_1' => 'nullable|email|max:255',
+                'admin_email_2' => 'nullable|email|max:255',
+                'admin_number_1' => 'nullable|string|max:50',
+                'admin_number_2' => 'nullable|string|max:50',
+                // Address
+                'address' => 'nullable|string|max:500',
+            ]);
+
+            // Custom validation: At least 1 admin email and 1 admin number required
+            $adminEmails = array_filter([
+                $request->admin_email_1,
+                $request->admin_email_2,
+            ]);
+            
+            $adminNumbers = array_filter([
+                $request->admin_number_1,
+                $request->admin_number_2,
+            ]);
+
+            if (empty($adminEmails)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'At least one admin email is required',
+                    'errors' => ['admin_email_1' => ['At least one admin email is required']]
+                ], 422);
+            }
+
+            if (empty($adminNumbers)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'At least one admin number is required',
+                    'errors' => ['admin_number_1' => ['At least one admin number is required']]
+                ], 422);
+            }
+
+            $settings->update($request->only([
+                'staff_email_1', 'staff_email_2', 'staff_email_3',
+                'staff_number_1', 'staff_number_2', 'staff_number_3',
+                'admin_email_1', 'admin_email_2',
+                'admin_number_1', 'admin_number_2',
+                'address'
+            ]));
+
+            return response()->json(['success' => true, 'message' => 'Settings updated successfully!', 'settings' => $settings]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error updating settings: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function sendOTP(Request $request)
+    {
+        if (!Session::has('admin_logged_in')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        try {
+            $request->validate([
+                'phone_number' => 'required|string|max:50',
+            ]);
+
+            $adminSettings = AdminSetting::first();
+            if (!$adminSettings) {
+                return response()->json(['success' => false, 'message' => 'Admin settings not found'], 404);
+            }
+
+            // OTP is sent only to main admin number from DB
+            $mainNumber = $adminSettings->admin_number_1;
+            if (empty(trim((string) $mainNumber))) {
+                return response()->json(['success' => false, 'message' => 'Please add your main phone number in Profile first.'], 422);
+            }
+            $normalized = $this->normalizePhoneForTwilio($request->phone_number);
+            $normalizedMain = $this->normalizePhoneForTwilio($mainNumber);
+            if ($normalized !== $normalizedMain) {
+                return response()->json(['success' => false, 'message' => 'Phone number does not match your main admin number. OTP is sent only to the number in your profile.'], 422);
+            }
+
+            if (!preg_match('/^\+\d{10,15}$/', $normalized)) {
+                return response()->json(['success' => false, 'message' => 'Invalid phone format. Use E.164 (e.g. +917877829435).'], 422);
+            }
+
+            $verifyServiceSid = config('services.twilio.verify_service_sid');
+            if (!empty($verifyServiceSid)) {
+                // Use Twilio Verify API (sends OTP itself)
+                try {
+                    $this->startTwilioVerify($normalized);
+                    Session::put('otp_phone_to', $normalized);
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'OTP sent successfully to your phone number!',
+                    ]);
+                } catch (\Exception $e) {
+                    \Log::error('Twilio Verify Error: ' . $e->getMessage());
+                    $msg = 'Could not send OTP. ';
+                    if (config('app.debug')) {
+                        $msg .= $e->getMessage();
+                    } else {
+                        $msg .= 'Check TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_VERIFY_SERVICE_SID in .env.';
+                    }
+                    return response()->json(['success' => false, 'message' => $msg], 500);
+                }
+            }
+
+            // Fallback: generate OTP and send via Messages API
+            $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            $otpExpiresAt = Carbon::now()->addHours(24);
+            $adminSettings->update([
+                'otp' => $otp,
+                'otp_expires_at' => $otpExpiresAt,
+            ]);
+            try {
+                $this->sendTwilioSMS($mainNumber, "Your one time password for admin is: {$otp}");
+            } catch (\Exception $e) {
+                \Log::error('Twilio SMS Error: ' . $e->getMessage());
+                $msg = 'Could not send OTP. ';
+                if (config('app.debug')) {
+                    $msg .= $e->getMessage();
+                } else {
+                    $msg .= 'Set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER in .env.';
+                }
+                return response()->json(['success' => false, 'message' => $msg], 500);
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP sent successfully to your phone number!',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error sending OTP: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function verifyOTP(Request $request)
+    {
+        if (!Session::has('admin_logged_in')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        try {
+            $request->validate([
+                'otp' => 'required|string|min:4|max:10',
+            ]);
+
+            $adminSettings = AdminSetting::first();
+            if (!$adminSettings) {
+                return response()->json(['success' => false, 'message' => 'Admin settings not found'], 404);
+            }
+
+            // Twilio Verify: check using VerificationCheck API
+            $otpPhoneTo = Session::get('otp_phone_to');
+            if (!empty($otpPhoneTo) && config('services.twilio.verify_service_sid')) {
+                try {
+                    $approved = $this->checkTwilioVerify($otpPhoneTo, $request->otp);
+                    if ($approved) {
+                        Session::forget('otp_phone_to');
+                        Session::put('otp_verified', true);
+                        Session::put('otp_verified_at', now());
+                        return response()->json(['success' => true, 'message' => 'OTP verified successfully!']);
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Twilio Verify Check Error: ' . $e->getMessage());
+                    return response()->json(['success' => false, 'message' => 'Invalid or expired OTP. Please request a new one.'], 422);
+                }
+                return response()->json(['success' => false, 'message' => 'Invalid OTP. Please try again.'], 422);
+            }
+
+            // Fallback: DB OTP
+            if (!$adminSettings->otp || !$adminSettings->otp_expires_at) {
+                return response()->json(['success' => false, 'message' => 'No OTP found. Please request a new OTP.'], 422);
+            }
+            if (Carbon::now()->gt($adminSettings->otp_expires_at)) {
+                return response()->json(['success' => false, 'message' => 'OTP has expired. Please request a new OTP.'], 422);
+            }
+            if ($adminSettings->otp !== $request->otp) {
+                return response()->json(['success' => false, 'message' => 'Invalid OTP. Please try again.'], 422);
+            }
+            Session::put('otp_verified', true);
+            Session::put('otp_verified_at', now());
+            return response()->json(['success' => true, 'message' => 'OTP verified successfully!']);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error verifying OTP: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function resetPasswordOTP(Request $request)
+    {
+        if (!Session::has('admin_logged_in')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        try {
+            $request->validate([
+                'password' => 'required|string|min:6|max:255',
+                'confirm_password' => 'required|string|same:password',
+            ]);
+
+            // Check if OTP was verified
+            if (!Session::get('otp_verified')) {
+                return response()->json(['success' => false, 'message' => 'Please verify OTP first'], 422);
+            }
+
+            $adminSettings = AdminSetting::first();
+            if (!$adminSettings) {
+                return response()->json(['success' => false, 'message' => 'Admin settings not found'], 404);
+            }
+
+            // Update password
+            $adminSettings->update([
+                'admin_password' => $request->password, // Will be auto-hashed by model
+                'otp' => null, // Clear OTP after use
+                'otp_expires_at' => null,
+            ]);
+
+            // Clear OTP verification session
+            Session::forget(['otp_verified', 'otp_verified_at', 'otp_phone_to']);
+
+            // Logout user (password changed, need to login again)
+            Session::flush();
+
+            return response()->json([
+                'success' => true, 
+                'message' => 'Password reset successfully! Please login with your new password.'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error resetting password: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /** Twilio Verify API: start SMS verification. Twilio sends the OTP. */
+    private function startTwilioVerify(string $to): void
+    {
+        $sid = config('services.twilio.account_sid');
+        $token = config('services.twilio.auth_token');
+        $serviceSid = config('services.twilio.verify_service_sid');
+        if (!$sid || !$token || !$serviceSid) {
+            throw new \Exception('Set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_VERIFY_SERVICE_SID in .env.');
+        }
+        $url = "https://verify.twilio.com/v2/Services/" . trim($serviceSid) . "/Verifications";
+        // CustomMessage supports {{code}} placeholder in Verify templates
+        $data = [
+            'To' => $to,
+            'Channel' => 'sms',
+            'CustomFriendlyName' => 'Hotel Admin',
+            'CustomMessage' => 'Hotel admin one time password is: {{code}}. Valid for 1 minute.',
+        ];
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERPWD, "{$sid}:{$token}");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($httpCode < 200 || $httpCode >= 300) {
+            $err = json_decode($response, true);
+            $msg = $err['message'] ?? $err['error_message'] ?? 'Verify API error';
+            throw new \Exception($msg);
+        }
+    }
+
+    /** Twilio Verify API: check the code. Returns true if status is approved. */
+    private function checkTwilioVerify(string $to, string $code): bool
+    {
+        $sid = config('services.twilio.account_sid');
+        $token = config('services.twilio.auth_token');
+        $serviceSid = config('services.twilio.verify_service_sid');
+        if (!$sid || !$token || !$serviceSid) {
+            throw new \Exception('Verify not configured.');
+        }
+        $url = "https://verify.twilio.com/v2/Services/" . trim($serviceSid) . "/VerificationCheck";
+        $data = ['To' => $to, 'Code' => $code];
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERPWD, "{$sid}:{$token}");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        $body = json_decode($response, true);
+        if ($httpCode === 404 || ($body && ($body['status'] ?? '') !== 'approved')) {
+            return false;
+        }
+        return ($body['status'] ?? '') === 'approved' || ($body['valid'] ?? false) === true;
+    }
+
+    private function sendTwilioSMS($to, $message)
+    {
+        $accountSid = config('services.twilio.account_sid');
+        $authToken = config('services.twilio.auth_token');
+        $fromNumber = config('services.twilio.phone_number');
+
+        if (!$accountSid || !$authToken || !$fromNumber) {
+            throw new \Exception('Twilio credentials not configured. Set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER in .env.');
+        }
+
+        $to = $this->normalizePhoneForTwilio($to);
+        if (!preg_match('/^\+\d{10,15}$/', $to)) {
+            throw new \Exception('Phone number must be E.164 (e.g. +917877829435) or 10 digits.');
+        }
+        $fromNumber = preg_replace('/\s+/', '', trim((string) $fromNumber));
+
+        $url = "https://api.twilio.com/2010-04-01/Accounts/{$accountSid}/Messages.json";
+        $data = [
+            'From' => $fromNumber,
+            'To' => $to,
+            'Body' => $message,
+        ];
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERPWD, "{$accountSid}:{$authToken}");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode !== 201) {
+            $error = json_decode($response, true);
+            $twilioMsg = $error['message'] ?? $error['error_message'] ?? 'Unknown error';
+            $code = $error['code'] ?? null;
+            throw new \Exception('Twilio: ' . ($code ? "{$code} - " : '') . $twilioMsg);
+        }
+
+        return true;
+    }
+
+    /** Normalize phone to E.164 for comparison and Twilio (strip spaces; 10 digits => +91). */
+    private function normalizePhoneForTwilio($num): string
+    {
+        $n = preg_replace('/\s+/', '', trim((string) $num));
+        if (preg_match('/^\d{10}$/', $n)) {
+            return '+91' . $n;
+        }
+        if (preg_match('/^\+?\d{10,15}$/', $n)) {
+            return (str_starts_with($n, '+') ? $n : '+' . $n);
+        }
+        return $n;
     }
 }

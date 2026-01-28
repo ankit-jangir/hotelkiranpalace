@@ -15,9 +15,11 @@
                 <!-- Subscribe Section (Below Description) -->
                 <div class="footer-subscribe">
                     <h6 class="subscribe-heading mb-2">Subscribe For Latest Updates</h6>
-                    <form class="d-flex gap-2 subscribe-form" id="subscribeForm">
-                        <input type="email" class="form-control subscribe-input" placeholder="Enter Your Email Address"
-                            required>
+                    <form class="d-flex gap-2 subscribe-form" id="subscribeForm" method="POST"
+                        action="{{ route('subscribe.store') }}">
+                        @csrf
+                        <input type="email" name="email" class="form-control subscribe-input"
+                            placeholder="Enter Your Email Address" required>
                         <button type="submit" class="btn subscribe-btn" id="subscribeBtn">
                             <span class="subscribe-btn-text">Subscribe</span>
                             <span class="subscribe-btn-loader d-none">
@@ -55,22 +57,60 @@
             <div class="col-lg-3 col-md-6 col-12 mb-4 mb-lg-0">
                 <h5 class="footer-heading mb-3">Get in Touch</h5>
                 <ul class="list-unstyled footer-contact">
+
+                    {{-- Address --}}
+                    @if (!empty($adminSetting->address))
                     <li class="mb-3 d-flex align-items-start">
                         <i class="fas fa-map-marker-alt me-2 mt-1"></i>
-                        <a href="https://www.google.com/maps/search/?api=1&query=Royal+Palace+Road,+Heritage+District,+New+Delhi,+India+110001"
-                            target="_blank" class="footer-contact-link flex-1">Royal Palace Road, Heritage District, New
-                            Delhi, India 110001</a>
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($adminSetting->address) }}"
+                            target="_blank" class="footer-contact-link flex-1">
+                            {{ $adminSetting->address }}
+                        </a>
                     </li>
-                    <li class="mb-3 d-flex align-items-start">
+                    @endif
+
+                    {{-- Phone Numbers --}}
+                    @if (!empty($adminSetting->admin_number_1))
+                    <li class="mb-2 d-flex align-items-start">
                         <i class="fas fa-phone me-2 mt-1"></i>
-                        <a href="tel:+911145678900" class="footer-contact-link">+91 11 4567 8900</a>
+                        <a href="tel:{{ preg_replace('/\s+/', '', $adminSetting->admin_number_1) }}"
+                            class="footer-contact-link">
+                            {{ $adminSetting->admin_number_1 }}
+                        </a>
                     </li>
-                    <li class="mb-3 d-flex align-items-start">
+                    @endif
+
+                    {{-- @if (!empty($adminSetting->admin_number_2))
+                        <li class="mb-3 d-flex align-items-start">
+                            <i class="fas fa-phone me-2 mt-1"></i>
+                            <a href="tel:{{ preg_replace('/\s+/', '', $adminSetting->admin_number_2) }}"
+                    class="footer-contact-link">
+                    {{ $adminSetting->admin_number_2 }}
+                    </a>
+                    </li>
+                    @endif --}}
+
+                    {{-- Emails --}}
+                    @if (!empty($adminSetting->admin_email_1))
+                    <li class="mb-2 d-flex align-items-start">
                         <i class="fas fa-envelope me-2 mt-1"></i>
-                        <a href="mailto:reservations@kiranpalace.com"
-                            class="footer-contact-link">reservations@kiranpalace.com</a>
+                        <a href="mailto:{{ $adminSetting->admin_email_1 }}" class="footer-contact-link">
+                            {{ $adminSetting->admin_email_1 }}
+                        </a>
                     </li>
+                    @endif
+
+                    {{-- @if (!empty($adminSetting->admin_email_2))
+                        <li class="mb-3 d-flex align-items-start">
+                            <i class="fas fa-envelope me-2 mt-1"></i>
+                            <a href="mailto:{{ $adminSetting->admin_email_2 }}" class="footer-contact-link">
+                    {{ $adminSetting->admin_email_2 }}
+                    </a>
+                    </li>
+                    @endif --}}
+
                 </ul>
+
                 <p class="footer-follow mb-2">Follow Us:</p>
                 <div class="footer-social">
                     <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
@@ -111,7 +151,15 @@
 </button>
 
 <!-- WhatsApp Floating Button (Right Side) -->
-<a href="https://wa.me/911145678900?text=Hello%20Hotel%20Kiran%20Place%2C%20I%20would%20like%20to%20know%20more%20about%20your%20services"
-    target="_blank" class="whatsapp-float" aria-label="Contact us on WhatsApp">
+@if (!empty($adminSetting->admin_number_1))
+<a href="https://wa.me/{{ preg_replace('/\D/', '', $adminSetting->admin_number_1) }}?text={{ urlencode('Hello Hotel Kiran Place,
+            
+            I hope you are doing well.
+            
+            I would like to inquire about room availability, pricing, and other details. Kindly guide me with the available options.
+            
+            Thank you,
+            Looking forward to your response.') }}" target="_blank" class="whatsapp-float">
     <i class="fab fa-whatsapp"></i>
 </a>
+@endif

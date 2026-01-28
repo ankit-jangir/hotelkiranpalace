@@ -6,7 +6,7 @@
 @section('content')
 <div class="row g-3 mb-4">
     <!-- Stats Cards -->
-    <div class="col-lg-3 col-md-6 col-sm-6">
+    <div class="col-6 col-md-6 col-lg-3">
         <div class="admin-dashboard-stat-card admin-card-blogs">
             <div class="admin-dashboard-stat-icon">
                 <i class="fas fa-blog"></i>
@@ -18,7 +18,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 col-sm-6">
+    <div class="col-6 col-md-6 col-lg-3">
         <div class="admin-dashboard-stat-card admin-card-images">
             <div class="admin-dashboard-stat-icon">
                 <i class="fas fa-images"></i>
@@ -30,7 +30,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 col-sm-6">
+    <div class="col-6 col-md-6 col-lg-3">
         <div class="admin-dashboard-stat-card admin-card-rooms">
             <div class="admin-dashboard-stat-icon">
                 <i class="fas fa-bed"></i>
@@ -42,7 +42,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 col-sm-6">
+    <div class="col-6 col-md-6 col-lg-3">
         <div class="admin-dashboard-stat-card admin-card-inquiries">
             <div class="admin-dashboard-stat-icon">
                 <i class="fas fa-envelope"></i>
@@ -62,7 +62,7 @@
         <div class="admin-dashboard-table-card">
             <div class="admin-dashboard-table-header">
                 <h5 class="admin-dashboard-table-title">
-                    Subscribe User List 
+                    Subscribe User List
                     <span class="admin-dashboard-table-badge">{{ $totalSubscribes }}</span>
                 </h5>
                 <a href="{{ route('admin.user-subscribe-details') }}" class="admin-dashboard-view-all-btn">
@@ -83,16 +83,28 @@
                         @forelse($subscribeUsers as $index => $user)
                         <tr>
                             <td>{{ $index + 1 }}</td>
-                            <td>{{ $user['email'] }}</td>
-                            <td>{{ is_string($user['created_at']) ? \Carbon\Carbon::parse($user['created_at'])->format('d M Y') : $user['created_at']->format('d M Y') }}</td>
                             <td>
-                                <span class="admin-dashboard-status-badge active">Active</span>
+                                <a href="mailto:{{ $user->email }}" class="admin-gallery-table-email-link"
+                                    title="{{ $user->email }}">
+                                    {{ $user->email }}
+                                </a>
+                            </td>
+                            <td>{{ $user->created_at->format('d M Y') }}</td>
+                            <td>
+                                @php
+                                $hoursPassed = $user->created_at->diffInHours(now(), false);
+                                $daysPassed = ceil($hoursPassed / 24);
+                                if ($daysPassed <= 0) { $statusText='Current' ; } else { $statusText=(int)$daysPassed
+                                    . ' day' . ($daysPassed> 1 ? 's' : '') . ' ago';
+                                    }
+                                    @endphp
+                                    <span class="admin-dashboard-status-badge active">{{ $statusText }}</span>
                             </td>
                         </tr>
                         @empty
                         <tr>
                             <td colspan="4" class="text-center py-4">
-                                <p class="text-muted mb-0">No subscribers found.</p>
+                                <p class="text-muted mb-0">No subscribers found for current month.</p>
                             </td>
                         </tr>
                         @endforelse
@@ -125,27 +137,42 @@
                             <th>Email</th>
                             <th>Phone</th>
                             <th>Submitted Date</th>
-                            <th>Status</th>
+                            <th>Room Type</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($formSubmissions as $index => $submission)
+                        @php
+                        $roomTypes = [
+                        'deluxe' => 'Deluxe Room',
+                        'suite' => 'Suite',
+                        'executive' => 'Executive Room',
+                        'presidential' => 'Presidential Suite'
+                        ];
+                        $roomTypeDisplay = $submission->room_type ? ($roomTypes[$submission->room_type] ??
+                        ucfirst($submission->room_type)) : 'N/A';
+                        @endphp
                         <tr>
                             <td>{{ $index + 1 }}</td>
-                            <td>{{ $submission['name'] }}</td>
-                            <td>{{ $submission['email'] }}</td>
-                            <td>{{ $submission['phone'] }}</td>
-                            <td>{{ is_string($submission['created_at']) ? \Carbon\Carbon::parse($submission['created_at'])->format('d M Y') : $submission['created_at']->format('d M Y') }}</td>
+                            <td>{{ $submission->name }}</td>
                             <td>
-                                <span class="admin-dashboard-status-badge {{ $submission['status'] === 'responded' ? 'responded' : 'pending' }}">
-                                    {{ ucfirst($submission['status']) }}
+                                <a href="mailto:{{ $submission->email }}" class="admin-gallery-table-email-link"
+                                    title="{{ $submission->email }}">
+                                    {{ $submission->email }}
+                                </a>
+                            </td>
+                            <td>{{ $submission->country_code }} {{ $submission->phone }}</td>
+                            <td>{{ $submission->created_at->format('d M Y') }}</td>
+                            <td>
+                                <span class="admin-gallery-type-badge {{ $submission->room_type ?? '' }}">
+                                    {{ $roomTypeDisplay }}
                                 </span>
                             </td>
                         </tr>
                         @empty
                         <tr>
                             <td colspan="6" class="text-center py-4">
-                                <p class="text-muted mb-0">No form submissions found.</p>
+                                <p class="text-muted mb-0">No form submissions found for current month.</p>
                             </td>
                         </tr>
                         @endforelse
